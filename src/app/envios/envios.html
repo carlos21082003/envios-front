@@ -1,0 +1,158 @@
+<!-- CONTENEDOR PRINCIPAL -->
+<div class="p-6 min-h-screen font-roboto text-slate-900">
+
+  <!-- HEADER Y ACCIONES PRINCIPALES -->
+  <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+    <div>
+      <h2 class="text-2xl font-extrabold text-black">Gestión de Envíos</h2>
+      <p class="text-slate-500 text-sm">Monitorea y administra las órdenes de despacho activas.</p>
+    </div>
+    <div class="flex gap-2 w-full lg:w-auto">
+      <button class="flex-1 lg:flex-none bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+        <i class="fa fa-file-csv text-slate-400"></i> Exportar
+      </button>
+      <button routerLink="/envios/agregar" class="cursor-pointer flex-1 lg:flex-none bg-black text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
+        <i class="fa fa-plus-circle"></i> Nuevo Registro
+      </button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD DE ESTADOS (Mantenemos tus métricas estáticas por ahora) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  </div>
+
+  <!-- FILTROS Y TABLA -->
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+    <!-- BARRA DE BÚSQUEDA -->
+    <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row gap-4">
+      <div class="relative flex-1 group">
+        <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-black transition-colors"></i>
+        <input 
+          #searchInput
+          (keyup.enter)="buscarPorDni(searchInput.value)"
+          type="text" 
+          placeholder="Buscar por DNI del remitente y presiona Enter"
+          class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-200 focus:border-black outline-none transition-all text-sm font-medium">
+      </div>
+      <div class="flex gap-2">
+        <button 
+          (click)="buscarPorDni(searchInput.value)"
+          class="bg-black cursor-pointer text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-800 transition-all">
+          Buscar
+        </button>
+        <select class="cursor-pointer bg-white border border-slate-200 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 outline-none focus:border-black">
+          <option>Todos</option>
+          <option>Por salir</option>
+          <option>En camino</option>
+          <option>Entregado</option>
+          <option>Salió</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="bg-white text-slate-400 uppercase text-[11px] font-bold tracking-wider">
+            <th class="px-6 py-4 border-b border-slate-100">Remitente</th>
+            <th class="px-6 py-4 border-b border-slate-100">Destino</th>
+            <th class="px-6 py-4 border-b border-slate-100">Fecha</th>
+            <th class="px-6 py-4 border-b border-slate-100">Estado Envío</th>
+            <th class="px-6 py-4 border-b border-slate-100 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-50 relative">
+          
+          @if (cargando()) {
+            <tr>
+              <td colspan="5" class="px-6 py-8 text-center text-slate-500 font-medium">
+                <i class="fa-solid fa-spinner fa-spin mr-2"></i> Cargando envíos...
+              </td>
+            </tr>
+          } @else {
+            @for (envio of envios(); track envio.id) {
+              <tr class="hover:bg-slate-50/80 transition-colors">
+                <td class="px-6 py-4">
+                  <span class="text-xs font-medium tracking-tight">{{ envio.nombreRemitente }} • {{ envio.dniRemitente }}</span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-col text-sm font-bold">
+                    <span>{{ envio.provincia }}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="text-sm text-slate-600">{{ envio.fechaEnvio | date:'dd/MM/yyyy' }}</span>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold bg-black text-white uppercase tracking-tighter">
+                    {{ envio.estadoEnvio }}
+                  </span>
+                </td>
+
+                <!-- ── ACCIONES ── -->
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button (click)="verEnvio(envio.id)" title="Ver envío" class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
+                      <i class="fa-solid fa-eye text-[10px]"></i> Ver
+                    </button>
+                    <button title="Editar datos de envío" class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
+                      <i class="fa-solid fa-edit text-[10px]"></i> Editar
+                    </button>
+                    <button title="Actualizar estado del pago" class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
+                      <i class="fa-solid fa-credit-card text-[10px]"></i> Pago
+                    </button>
+                    <button title="Actualizar estado del envío" class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
+                      <i class="fa-solid fa-truck text-[10px]"></i> Estado
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="px-6 py-8 text-center text-slate-500 font-medium">
+                  @if (errorBusqueda()) {
+                    <i class="fa-solid fa-circle-exclamation text-red-400 mr-2"></i> No se encontró ningún envío con ese DNI.
+                  } @else {
+                    No hay envíos registrados en esta página.
+                  }
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- FOOTER TABLA (Paginación Dinámica) -->
+    <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs">
+      <p class="text-slate-400 font-bold uppercase tracking-widest">
+        Página {{ envios().length > 0 ? paginaActual() + 1 : 0 }} de {{ totalPaginas() }}
+      </p>
+      
+      <div class="flex gap-1">
+        <!-- Botón Anterior -->
+        <button 
+          (click)="cambiarPagina(paginaActual() - 1)"
+          [disabled]="paginaActual() === 0"
+          class="w-8 h-8 flex items-center justify-center border border-slate-200 rounded-lg bg-white text-slate-400 hover:text-black disabled:opacity-50 disabled:cursor-not-allowed">
+          <i class="fa fa-angle-left"></i>
+        </button>
+        
+        <!-- Indicador de página actual -->
+        <button class="w-8 h-8 flex items-center justify-center border border-slate-200 rounded-lg bg-black text-white font-bold shadow-sm">
+          {{ paginaActual() + 1 }}
+        </button>
+
+        <!-- Botón Siguiente -->
+        <button 
+          (click)="cambiarPagina(paginaActual() + 1)"
+          [disabled]="paginaActual() >= totalPaginas() - 1 || totalPaginas() === 0"
+          class="w-8 h-8 flex items-center justify-center border border-slate-200 rounded-lg bg-white text-slate-400 hover:text-black disabled:opacity-50 disabled:cursor-not-allowed">
+          <i class="fa fa-angle-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

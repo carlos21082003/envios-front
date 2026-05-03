@@ -1,3 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
+/* styles.css */
+
+@theme {
+  /* Identidad Pura */
+  --color-principal: #000000 ;    /* Blanco (Luz / Títulos / Botones Primarios) */
+  --color-secundario: #FFFFFF ;  
+  --font-principal: 'Roboto', sans-serif;
+}

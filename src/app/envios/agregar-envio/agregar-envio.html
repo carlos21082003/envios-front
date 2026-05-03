@@ -1,0 +1,325 @@
+<div class="p-6 min-h-screen text-slate-900">
+
+  <!-- HEADER -->
+  <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+    <div>
+      <div class="flex items-center gap-2 text-slate-400 text-sm mb-1">
+        <button (click)="cancelar()" class="hover:text-black transition-colors">
+          <i class="fa fa-arrow-left"></i> Envíos
+        </button>
+        <span>/</span>
+        <span class="text-black font-medium">
+          {{ modoVer() ? 'Detalle del envío' : 'Nuevo registro' }}
+        </span>
+      </div>
+      <h2 class="text-2xl font-extrabold text-black">
+        {{ modoVer() ? 'Detalle del Envío' : 'Registrar Envío' }}
+      </h2>
+      <p class="text-slate-500 text-sm">
+        {{ modoVer() ? 'Información completa del envío.' : 'Completa todos los datos del envío, producto y pago.' }}
+      </p>
+    </div>
+    <div class="flex gap-2">
+      <button
+        (click)="cancelar()"
+        class="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all">
+        {{ modoVer() ? 'Volver' : 'Cancelar' }}
+      </button>
+      @if (!modoVer()) {
+        <button
+          (click)="guardar()"
+          [disabled]="guardando()"
+          class="bg-black text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-800 transition-all flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+          @if (guardando()) {
+            <i class="fa fa-spinner fa-spin"></i> Guardando...
+          } @else {
+            <i class="fa fa-floppy-disk"></i> Guardar envío
+          }
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- ALERTA CARGANDO -->
+  @if (cargando()) {
+    <div class="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-3 text-slate-600 text-sm font-medium">
+      <i class="fa fa-spinner fa-spin text-slate-400"></i>
+      Cargando datos del envío...
+    </div>
+  }
+
+  <!-- ALERTA ÉXITO -->
+  @if (exitoso()) {
+    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-700 text-sm font-medium">
+      <i class="fa fa-circle-check text-green-500 text-lg"></i>
+      Envío registrado correctamente. Redirigiendo...
+    </div>
+  }
+
+  <!-- ALERTA ERROR -->
+  @if (errorGuardar()) {
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700 text-sm font-medium">
+      <i class="fa fa-circle-exclamation text-red-400 text-lg"></i>
+      {{ errorGuardar() }}
+    </div>
+  }
+
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+    <!-- COLUMNA IZQUIERDA -->
+    <div class="xl:col-span-2 flex flex-col gap-6">
+
+      <!-- REMITENTE -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <h3 class="text-sm font-extrabold text-black uppercase tracking-wide mb-4 flex items-center gap-2">
+          <i class="fa fa-user text-slate-400"></i> Remitente
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Nombre completo</label>
+            <input
+              [(ngModel)]="form.nombreRemitente"
+              [disabled]="modoVer()"
+              type="text"
+              placeholder="Ej: María López Sánchez"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"/>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">DNI</label>
+            <input
+              [(ngModel)]="form.dniRemitente"
+              [disabled]="modoVer()"
+              type="text"
+              placeholder="87654321"
+              maxlength="8"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- DESTINATARIO -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <h3 class="text-sm font-extrabold text-black uppercase tracking-wide mb-4 flex items-center gap-2">
+          <i class="fa fa-location-dot text-slate-400"></i> Destinatario
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Nombre completo</label>
+            <input
+              [(ngModel)]="form.nombreDestinatario"
+              [disabled]="modoVer()"
+              type="text"
+              placeholder="Ej: Juan Pérez Gutiérrez"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"/>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">DNI</label>
+            <input
+              [(ngModel)]="form.dniDestinatario"
+              [disabled]="modoVer()"
+              type="text"
+              placeholder="12345678"
+              maxlength="8"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"/>
+          </div>
+          <div class="flex flex-col gap-1.5 md:col-span-2">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Provincia destino</label>
+            <select
+              [(ngModel)]="form.provincia"
+              [disabled]="modoVer()"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed">
+              <option value="">Seleccionar provincia...</option>
+              @for (prov of provincias; track prov) {
+                <option [value]="prov">{{ prov }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- HORARIO Y ESTADO -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <h3 class="text-sm font-extrabold text-black uppercase tracking-wide mb-4 flex items-center gap-2">
+          <i class="fa fa-clock text-slate-400"></i> Horario y Estado
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Fecha de envío</label>
+            <input
+              [(ngModel)]="form.fechaEnvio"
+              [disabled]="modoVer()"
+              type="datetime-local"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"/>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Estado inicial</label>
+            <select
+              [(ngModel)]="form.estadoEnvio"
+              [disabled]="modoVer()"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed">
+              <option [value]="EstadoEnvio.PORSALIR">Por salir</option>
+              <option [value]="EstadoEnvio.SALIO">Salió</option>
+              <option [value]="EstadoEnvio.ENTRANSITO">En tránsito</option>
+              <option [value]="EstadoEnvio.ENTREGADO">Entregado</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Hora de salida</label>
+            <input
+              [(ngModel)]="form.horaSalida"
+              [disabled]="modoVer()"
+              type="time"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"/>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Hora de llegada</label>
+            <input
+              [(ngModel)]="form.horaLlegada"
+              [disabled]="modoVer()"
+              type="time"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"/>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COLUMNA DERECHA -->
+    <div class="flex flex-col gap-6">
+
+      <!-- PRODUCTO -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <h3 class="text-sm font-extrabold text-black uppercase tracking-wide mb-4 flex items-center gap-2">
+          <i class="fa fa-box text-slate-400"></i> Producto
+        </h3>
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Tipo de producto</label>
+            <select
+              [(ngModel)]="form.producto.tipoProducto"
+              [disabled]="modoVer()"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed">
+              <option value="">Seleccionar...</option>
+              <option>Caja</option>
+              <option>Bolsa</option>
+              <option>Paquete</option>
+              <option>Sobre</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">N° de paquetes</label>
+            <input
+              [(ngModel)]="form.producto.numeroPaquetes"
+              [disabled]="modoVer()"
+              type="number"
+              min="1"
+              placeholder="1"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"/>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Descripción</label>
+            <textarea
+              [(ngModel)]="form.producto.descripcion"
+              [disabled]="modoVer()"
+              rows="3"
+              placeholder="Ej: Caja de cartón con ropa y zapatos..."
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all resize-none disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGO -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <h3 class="text-sm font-extrabold text-black uppercase tracking-wide mb-4 flex items-center gap-2">
+          <i class="fa fa-credit-card text-slate-400"></i> Pago
+        </h3>
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Monto (S/.)</label>
+            <input
+              [(ngModel)]="form.pago.monto"
+              [disabled]="modoVer()"
+              type="number"
+              min="0"
+              step="0.50"
+              placeholder="0.00"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"/>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Método de pago</label>
+            <select
+              [(ngModel)]="form.pago.metodoPago"
+              [disabled]="modoVer()"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed">
+              <option value="">Seleccionar...</option>
+              <option value="EFECTIVO">Efectivo</option>
+              <option value="TRANSFERENCIA">Transferencia</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Fecha de pago</label>
+            <input
+              [(ngModel)]="form.pago.fechaPago"
+              [disabled]="modoVer()"
+              type="datetime-local"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"/>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Estado del pago</label>
+            <select
+              [(ngModel)]="form.pago.estadoPago"
+              [disabled]="modoVer()"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed">
+              <option [value]="EstadoPago.PAGADO">Pagado</option>
+              <option [value]="EstadoPago.PENDIENTE">Pendiente</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESUMEN -->
+      <div class="bg-slate-900 rounded-2xl p-6 text-white">
+        <h3 class="text-sm font-extrabold uppercase tracking-wide mb-4 text-slate-300">Resumen</h3>
+        <div class="flex flex-col gap-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-slate-400">Remitente</span>
+            <span class="font-medium truncate ml-4">{{ form.nombreRemitente || '—' }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Destino</span>
+            <span class="font-medium">{{ form.provincia || '—' }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Producto</span>
+            <span class="font-medium">{{ form.producto.tipoProducto || '—' }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Estado</span>
+            <span class="font-medium">{{ form.estadoEnvio || '—' }}</span>
+          </div>
+          <div class="border-t border-slate-700 my-2"></div>
+          <div class="flex justify-between text-base">
+            <span class="text-slate-300 font-bold">Total</span>
+            <span class="font-extrabold text-white">S/. {{ form.pago.monto | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <!-- botón solo en modo CREAR -->
+        @if (!modoVer()) {
+          <button
+            (click)="guardar()"
+            [disabled]="guardando()"
+            class="mt-5 w-full bg-white text-black py-2.5 rounded-xl text-sm font-bold hover:bg-slate-100 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+            @if (guardando()) {
+              <i class="fa fa-spinner fa-spin"></i> Guardando...
+            } @else {
+              <i class="fa fa-floppy-disk"></i> Guardar envío
+            }
+          </button>
+        }
+      </div>
+
+    </div>
+  </div>
+</div>

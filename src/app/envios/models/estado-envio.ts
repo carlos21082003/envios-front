@@ -1,0 +1,6 @@
+export enum EstadoEnvio {
+  SALIO = 'SALIO',
+  PORSALIR = 'PORSALIR',
+  ENTRANSITO = 'ENTRANSITO',
+  ENTREGADO = 'ENTREGADO'
+}

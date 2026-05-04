@@ -1,1 +1,161 @@
-<p>dashboard works!</p>
+<div class="p-6 min-h-screen text-slate-900">
+
+  <!-- HEADER -->
+  <div class="mb-6">
+    <h2 class="text-2xl font-extrabold text-black">Reportes</h2>
+    <p class="text-slate-500 text-sm">Resumen general del sistema de envíos.</p>
+  </div>
+
+  @if (cargando()) {
+    <div class="flex items-center justify-center py-20 text-slate-400 text-sm">
+      <i class="fa fa-spinner fa-spin mr-2 text-xl"></i> Cargando reportes...
+    </div>
+  }
+
+  @if (error()) {
+    <div class="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm flex items-center gap-2">
+      <i class="fa fa-circle-exclamation"></i> {{ error() }}
+    </div>
+  }
+
+  @if (reporte()) {
+
+    <!-- TARJETAS DE INFORMACIÓN -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-slate-600 shrink-0">
+          <i class="fa fa-layer-group"></i>
+        </div>
+        <div>
+          <p class="text-slate-500 text-xs font-bold uppercase tracking-tight">Total envíos</p>
+          <h3 class="text-2xl font-bold text-black">{{ reporte().totalEnvios }}</h3>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 shrink-0">
+          <i class="fa fa-circle-dollar-to-slot"></i>
+        </div>
+        <div>
+          <p class="text-slate-500 text-xs font-bold uppercase tracking-tight">Total recaudado</p>
+          <h3 class="text-2xl font-bold text-black">S/. {{ reporte().totalRecaudado | number:'1.2-2' }}</h3>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center text-yellow-600 shrink-0">
+          <i class="fa fa-clock"></i>
+        </div>
+        <div>
+          <p class="text-slate-500 text-xs font-bold uppercase tracking-tight">Pagos pendientes</p>
+          <h3 class="text-2xl font-bold text-black">{{ reporte().pagosPendientes }}</h3>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 shrink-0">
+          <i class="fa fa-boxes-stacked"></i>
+        </div>
+        <div>
+          <p class="text-slate-500 text-xs font-bold uppercase tracking-tight">Total paquetes</p>
+          <h3 class="text-2xl font-bold text-black">{{ reporte().totalPaquetes }}</h3>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SEGUNDA FILA DE TARJETAS -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-slate-600 shrink-0">
+          <i class="fa fa-truck-fast"></i>
+        </div>
+        <div>
+          <p class="text-slate-500 text-xs font-bold uppercase tracking-tight">En tránsito</p>
+          <h3 class="text-2xl font-bold text-black">{{ reporte().enviosEnTransito }}</h3>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-slate-600 shrink-0">
+          <i class="fa fa-money-bill"></i>
+        </div>
+        <div>
+          <p class="text-slate-500 text-xs font-bold uppercase tracking-tight">Total efectivo</p>
+          <h3 class="text-2xl font-bold text-black">S/. {{ reporte().totalEfectivo | number:'1.2-2' }}</h3>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 shrink-0">
+          <i class="fa fa-building-columns"></i>
+        </div>
+        <div>
+          <p class="text-slate-500 text-xs font-bold uppercase tracking-tight">Total transferencia</p>
+          <h3 class="text-2xl font-bold text-black">S/. {{ reporte().totalTransferencia | number:'1.2-2' }}</h3>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- GRÁFICAS -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Gráfica barras - Envíos por provincia -->
+      <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <div class="mb-4">
+          <h3 class="text-sm font-extrabold text-black uppercase tracking-wide">
+            Envíos por provincia
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Distribución de envíos según el destino</p>
+        </div>
+        <div style="height: 260px; position: relative;">
+          <canvas #graficaProvincias></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfica dona - Estado de pagos -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <div class="mb-4">
+          <h3 class="text-sm font-extrabold text-black uppercase tracking-wide">
+            Estado de pagos
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Distribución por estado de cobro</p>
+        </div>
+        <div style="height: 260px; position: relative;">
+          <canvas #graficaPagos></canvas>
+        </div>
+
+        <!-- Resumen debajo de la dona -->
+        <div class="mt-4 flex flex-col gap-2 border-t border-slate-100 pt-4">
+          <div class="flex justify-between items-center text-xs">
+            <span class="flex items-center gap-1.5 text-slate-500">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#1a1a2e] shrink-0"></span>
+              Pagado
+            </span>
+            <span class="font-bold text-black">{{ reporte().pagosPagados }}</span>
+          </div>
+          <div class="flex justify-between items-center text-xs">
+            <span class="flex items-center gap-1.5 text-slate-500">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#e2c27d] shrink-0"></span>
+              Pendiente
+            </span>
+            <span class="font-bold text-black">{{ reporte().pagosPendientesGrafica }}</span>
+          </div>
+          <div class="flex justify-between items-center text-xs">
+            <span class="flex items-center gap-1.5 text-slate-500">
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-400 shrink-0"></span>
+              Pago al recoger
+            </span>
+            <span class="font-bold text-black">{{ reporte().pagosPagadoAlRecogerGrafica }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  }
+
+</div>

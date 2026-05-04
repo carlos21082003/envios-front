@@ -1,7 +1,7 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject, input, output, signal } from '@angular/core';
 import { TipoProductoDTO } from '../../../productos/models/tipo-producto';
 import { TipoProductoService } from '../../../productos/service/tipo-producto-service';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-modal-eliminar-tipo-producto',

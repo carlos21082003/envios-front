@@ -3,19 +3,8 @@
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6"
        (click)="$event.stopPropagation()">
 
-    <div class="flex items-center justify-between mb-5">
-      <div>
-        <h3 class="text-base font-extrabold text-black">Eliminar tipo</h3>
-        <p class="text-xs text-slate-400 mt-0.5">Esta acción no se puede deshacer</p>
-      </div>
-      <button (click)="cerrar.emit()"
-        class="w-8 h-8 flex items-center cursor-pointer justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-black hover:bg-slate-50 transition-all">
-        <i class="fa-solid fa-xmark text-sm"></i>
-      </button>
-    </div>
-
     <p class="text-sm text-slate-600 mb-5">
-      ¿Estás seguro que deseas eliminar el tipo
+      ¿Estás seguro que deseas desactivar el tipo
       <span class="font-bold text-black">{{ tipo().nombre }}</span>?
     </p>
 
@@ -32,8 +21,8 @@
       </button>
       <button (click)="confirmar()" [disabled]="eliminando()"
         class="flex-1 py-2.5 cursor-pointer bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-        @if (eliminando()) { <i class="fa fa-spinner fa-spin"></i> Eliminando... }
-        @else { <i class="fa fa-trash"></i> Eliminar }
+        @if (eliminando()) { <i class="fa fa-spinner fa-spin"></i> Desactivando... }
+        @else { <i class="fa fa-trash"></i> Desactivar }
       </button>
     </div>
   </div>

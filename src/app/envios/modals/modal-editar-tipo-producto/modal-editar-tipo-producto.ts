@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './modal-editar-tipo-producto.css',
 })
 export class ModalEditarTipoProducto {
-   private tipoProductoService = inject(TipoProductoService);
+ private tipoProductoService = inject(TipoProductoService);
 
   tipoId      = input.required<number>();
   cerrar      = output<void>();
@@ -20,7 +20,7 @@ export class ModalEditarTipoProducto {
   cargando  = signal(true);
   error     = signal<string | null>(null);
 
-  form = { nombre: '', precioBase: 0, descripcion: '' };
+  form = { nombre: '', precioBase: 0, descripcion: '', activo: true };
 
   ngOnInit(): void {
     this.tipoProductoService.getTipoProductoById(this.tipoId()).subscribe({
@@ -29,6 +29,7 @@ export class ModalEditarTipoProducto {
           nombre:      tipo.nombre,
           precioBase:  tipo.precioBase,
           descripcion: tipo.descripcion,
+          activo:      tipo.activo ?? true,
         };
         this.cargando.set(false);
       },

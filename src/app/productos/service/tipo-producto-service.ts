@@ -12,16 +12,13 @@ export class TipoProductoService {
 
   private readonly urlTipoProductos = environment.apiUrl + '/tipo-productos';
 
-  listarTipoProductos(pagina: number = 0, cantidad: number = 15): Observable<any> {
+  listarPaginado(pagina: number = 0, cantidad: number = 15, soloActivos: boolean = false): Observable<any> {
     const params = new HttpParams()
-      .set('pagina', pagina)
-      .set('cantidad', cantidad);
-    return this.http.get<any>(this.urlTipoProductos, { params }).pipe(
-      catchError((error) => {
-        console.error('Error al listar tipos de producto:', error);
-        throw error;
-      })
-    );
+      .set('pagina', pagina.toString())
+      .set('cantidad', cantidad.toString())
+      .set('soloActivos', soloActivos.toString()); 
+      
+    return this.http.get<any>(this.urlTipoProductos, { params });
   }
 
   getTipoProductoById(id: number): Observable<any> {
@@ -34,7 +31,7 @@ export class TipoProductoService {
   }
 
   guardarTipoProducto(tipoProducto: TipoProductoDTO): Observable<any> {
-    return this.http.post<any>(this.urlTipoProductos, tipoProducto).pipe(
+    return this.http.post<any>(`${this.urlTipoProductos}/guardar`, tipoProducto).pipe(
       catchError((error) => {
         console.error('Error al guardar tipo de producto:', error);
         throw error;

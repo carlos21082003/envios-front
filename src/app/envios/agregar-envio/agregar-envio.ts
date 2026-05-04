@@ -72,13 +72,13 @@ export class AgregarEnvio {
   }
 
   cargarTiposProducto(): void {
-   this.tipoProductoService.listarTipoProductos().subscribe({
-     next: (res) => {
-       console.log('respuesta tipos:', res); 
-       this.tiposProducto.set(res.content);
-     },
-     error: () => console.error('Error al cargar tipos de producto')
-   });
+    this.tipoProductoService.listarPaginado(0, 50, true).subscribe({
+      next: (res) => {
+        console.log('Tipos activos recibidos:', res.content); 
+        this.tiposProducto.set(res.content);
+      },
+      error: () => console.error('Error al cargar tipos de producto')
+    });
   }
 
   cargarEnvio(id: number): void {

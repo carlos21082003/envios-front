@@ -31,9 +31,10 @@ export class ModalEditarProductos implements OnInit {
   };
 
    ngOnInit(): void {
-    // cargar tipos y producto en paralelo
-    this.tipoProductoService.listarTipoProductos().subscribe({
-      next: (res) => this.tiposProducto.set(res.content),
+    this.tipoProductoService.listarPaginado(0, 50).subscribe({
+      next: (res) => {
+        this.tiposProducto.set(res.content || res); 
+      },
       error: () => console.error('Error al cargar tipos')
     });
 

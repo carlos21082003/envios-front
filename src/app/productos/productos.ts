@@ -21,6 +21,7 @@ export class Productos {
   paginaActual   = signal(0);
   totalPaginas   = signal(0);
   totalElementos = signal(0);
+  mostrarTodos   = signal(false);
   readonly cantidad = 15;
 
   modalAgregar     = signal(false);
@@ -34,18 +35,28 @@ export class Productos {
 
   cargar(): void {
     this.cargando.set(true);
-    this.tipoProductoService.listarTipoProductos(this.paginaActual(), this.cantidad).subscribe({
-      next: (res) => {
-        this.tiposProducto.set(res.content);
-        this.totalPaginas.set(res.totalPages);
-        this.totalElementos.set(res.totalElements);
-        this.cargando.set(false);
-      },
-      error: () => this.cargando.set(false)
-    });
+    const soloActivosFiltro = !this.mostrarTodos(); 
+  
+    this.tipoProductoService.listarPaginado(this.paginaActual(), this.cantidad, soloActivosFiltro)
+      .subscribe({
+        next: (res) => {
+          this.tiposProducto.set(res.content);
+          this.totalPaginas.set(res.totalPages);
+          this.totalElementos.set(res.totalElements);
+          this.cargando.set(false);
+        },
+        error: () => this.cargando.set(false)
+      });
+  }
+  
+  toggleMostrarTodos(): void {
+    this.mostrarTodos.update(v => !v);
+    this.paginaActual.set(0); 
+    this.cargar();
   }
 
   abrirEditar(tipo: TipoProductoDTO): void {
+    console.log('Editando tipo:', tipo);
     this.tipoSeleccionado.set(tipo);
     this.modalEditar.set(true);
   }

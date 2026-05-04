@@ -3,4 +3,5 @@ export interface TipoProductoDTO {
   nombre: string;
   precioBase: number;
   descripcion: string;
+  activo?: boolean;
 }

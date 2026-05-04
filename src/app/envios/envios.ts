@@ -2,23 +2,31 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink, RouterModule } from '@angular/router';
 import { EnviosService } from './service/envios-service';
 import { CommonModule, DatePipe } from '@angular/common';
+import { ModalEditarEnvio } from "./modals/modal-editar-envio/modal-editar-envio";
+import { ModalEditarPagos } from "./modals/modal-editar-pagos/modal-editar-pagos";
+import { ModalEditarProductos } from "./modals/modal-editar-productos/modal-editar-productos";
 
 @Component({
   selector: 'app-envios',
-  imports: [RouterModule,CommonModule, DatePipe,RouterLink],
+  imports: [RouterModule, CommonModule, DatePipe, RouterLink, ModalEditarEnvio, ModalEditarPagos, ModalEditarProductos],
   templateUrl: './envios.html',
   styleUrl: './envios.css',
 })
 export class Envios implements OnInit {
- private enviosService = inject(EnviosService);
- private router = inject(Router);
+  private enviosService = inject(EnviosService);
+  private router        = inject(Router);
 
-  // Signals para el manejo de estado
-  envios = signal<any[]>([]);
-  paginaActual = signal<number>(0);
-  totalPaginas = signal<number>(0);
-  cargando = signal<boolean>(true);
+  envios        = signal<any[]>([]);
+  paginaActual  = signal<number>(0);
+  totalPaginas  = signal<number>(0);
+  cargando      = signal<boolean>(true);
   errorBusqueda = signal<boolean>(false);
+
+  modalEnvio    = signal(false);
+  modalPago     = signal(false);
+  modalProducto = signal(false);
+
+  envioSeleccionado = signal<any>(null);
 
   ngOnInit(): void {
     this.cargarEnvios();
@@ -27,7 +35,7 @@ export class Envios implements OnInit {
   cargarEnvios(): void {
     this.cargando.set(true);
     this.errorBusqueda.set(false);
-    
+
     this.enviosService.listarEnvios(this.paginaActual(), 15).subscribe({
       next: (response) => {
         this.envios.set(response.content);
@@ -43,16 +51,13 @@ export class Envios implements OnInit {
 
   buscarPorDni(dni: string): void {
     const dniLimpio = dni.trim();
-    
     if (!dniLimpio) {
       this.paginaActual.set(0);
       this.cargarEnvios();
       return;
     }
-
     this.cargando.set(true);
     this.errorBusqueda.set(false);
-
     this.enviosService.rastrearEnvio(dniLimpio).subscribe({
       next: (response) => {
         this.envios.set([response]);
@@ -77,5 +82,24 @@ export class Envios implements OnInit {
 
   verEnvio(id: number): void {
     this.router.navigate(['/envios/ver', id]);
-  } 
+  }
+
+  abrirModalEnvio(envio: any): void {
+    this.envioSeleccionado.set(envio);
+    this.modalEnvio.set(true);
+  }
+
+  abrirModalPago(envio: any): void {
+    this.envioSeleccionado.set(envio);
+    this.modalPago.set(true);
+  }
+
+  abrirModalProducto(envio: any): void {
+    this.envioSeleccionado.set(envio);
+    this.modalProducto.set(true);
+  }
+
+  onActualizado(): void {
+    this.cargarEnvios();
+  }
 }

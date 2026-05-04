@@ -1,0 +1,121 @@
+<div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
+     (click)="cerrar.emit()">
+
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto"
+       (click)="$event.stopPropagation()">
+
+    <div class="flex items-center justify-between mb-5">
+      <div>
+        <h3 class="text-base font-extrabold text-black">Editar envío</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Actualiza los datos del envío</p>
+      </div>
+      <button (click)="cerrar.emit()"
+        class="w-8 h-8 flex items-center cursor-pointer justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-black hover:bg-slate-50 transition-all">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+
+    @if (cargando()) {
+      <div class="py-8 text-center text-slate-400 text-sm">
+        <i class="fa fa-spinner fa-spin mr-2"></i> Cargando datos...
+      </div>
+    } @else {
+
+      <!-- Remitente -->
+      <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wide mb-3">
+        <i class="fa fa-user mr-1"></i> Remitente
+      </p>
+      <div class="grid grid-cols-2 gap-3 mb-5">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Nombre</label>
+          <input [(ngModel)]="form.nombreRemitente" type="text"
+            class="px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all"/>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">DNI</label>
+          <input [(ngModel)]="form.dniRemitente" type="text" maxlength="8"
+            class="px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all"/>
+        </div>
+      </div>
+
+      <!-- Destinatario -->
+      <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wide mb-3">
+        <i class="fa fa-location-dot mr-1"></i> Destinatario
+      </p>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Nombre</label>
+          <input [(ngModel)]="form.nombreDestinatario" type="text"
+            class="px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all"/>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">DNI</label>
+          <input [(ngModel)]="form.dniDestinatario" type="text" maxlength="8"
+            class="px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all"/>
+        </div>
+      </div>
+      <div class="flex flex-col gap-1.5 mb-5">
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Provincia</label>
+        <select [(ngModel)]="form.provincia"
+          class="px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all bg-white">
+          @for (prov of provincias; track prov) {
+            <option [value]="prov">{{ prov }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Horario y estado -->
+      <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wide mb-3">
+        <i class="fa fa-clock mr-1"></i> Horario y Estado
+      </p>
+      <div class="grid grid-cols-2 gap-3 mb-5">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Fecha envío</label>
+          <input [(ngModel)]="form.fechaEnvio" type="datetime-local"
+            class="px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all"/>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Estado</label>
+          <select [(ngModel)]="form.estadoEnvio"
+            class="px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all bg-white">
+            <option [value]="EstadoEnvio.PORSALIR">Por salir</option>
+            <option [value]="EstadoEnvio.SALIO">Salió</option>
+            <option [value]="EstadoEnvio.ENTRANSITO">En tránsito</option>
+            <option [value]="EstadoEnvio.ENTREGADO">Entregado</option>
+          </select>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Hora salida</label>
+          <input [(ngModel)]="form.horaSalida" type="time"
+            class="px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all"/>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Hora llegada</label>
+          <input [(ngModel)]="form.horaLlegada" type="time"
+            class="px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all"/>
+        </div>
+      </div>
+    }
+
+    @if (error()) {
+      <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 flex items-center gap-2">
+        <i class="fa-solid fa-circle-exclamation"></i> {{ error() }}
+      </div>
+    }
+
+    <div class="flex gap-2">
+      <button (click)="cerrar.emit()"
+        class="flex-1 py-2.5 cursor-pointer border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">
+        Cancelar
+      </button>
+      <button (click)="guardar()" [disabled]="guardando() || cargando()"
+        class="flex-1 py-2.5 cursor-pointer bg-black text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+        @if (guardando()) {
+          <i class="fa fa-spinner fa-spin"></i> Guardando...
+        } @else {
+          Actualizar
+        }
+      </button>
+    </div>
+  </div>
+</div>

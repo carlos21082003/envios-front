@@ -1,1 +1,147 @@
-<p>pagos works!</p>
+<div class="p-6 min-h-screen text-slate-900">
+
+  <!-- HEADER -->
+  <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+    <div>
+      <h2 class="text-2xl font-extrabold text-black">Gestión de Pagos</h2>
+      <p class="text-slate-500 text-sm">Monitorea y administra los pagos de los envíos.</p>
+    </div>
+    <button class="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all flex items-center gap-2">
+      <i class="fa fa-file-csv text-slate-400"></i> Exportar
+    </button>
+  </div>
+
+  <!-- TABLA -->
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+    <!-- TABLA -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="bg-white text-slate-400 uppercase text-[11px] font-bold tracking-wider">
+            <th class="px-6 py-4 border-b border-slate-100">#ID</th>
+            <th class="px-6 py-4 border-b border-slate-100">Monto</th>
+            <th class="px-6 py-4 border-b border-slate-100">Método</th>
+            <th class="px-6 py-4 border-b border-slate-100">Fecha pago</th>
+            <th class="px-6 py-4 border-b border-slate-100">Estado</th>
+            <th class="px-6 py-4 border-b border-slate-100 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-50">
+
+          @if (cargando()) {
+            @for (i of [1,2,3,4,5]; track i) {
+              <tr>
+                <td colspan="6" class="px-6 py-4">
+                  <div class="h-4 bg-slate-100 rounded animate-pulse w-full"></div>
+                </td>
+              </tr>
+            }
+          }
+
+          @if (error()) {
+            <tr>
+              <td colspan="6" class="px-6 py-8 text-center text-sm text-slate-400">
+                <i class="fa fa-circle-exclamation text-red-400 text-xl mb-2 block"></i>
+                {{ error() }}
+              </td>
+            </tr>
+          }
+
+          @if (!cargando() && !error() && pagos().length === 0) {
+            <tr>
+              <td colspan="6" class="px-6 py-10 text-center text-sm text-slate-400">
+                <i class="fa fa-credit-card text-2xl mb-2 block"></i>
+                No hay pagos registrados
+              </td>
+            </tr>
+          }
+
+          @for (pago of pagos(); track pago.id) {
+            <tr class="hover:bg-slate-50/80 transition-colors">
+
+              <td class="px-6 py-4">
+                <span class="font-mono text-[11px] font-bold text-slate-400">#{{ pago.id }}</span>
+              </td>
+
+              <td class="px-6 py-4">
+                <span class="text-sm font-bold text-black">S/. {{ pago.monto | number:'1.2-2' }}</span>
+              </td>
+
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold"
+                  [class]="badgeMetodo(pago.metodoPago)">
+                  {{ pago.metodoPago }}
+                </span>
+              </td>
+
+              <td class="px-6 py-4">
+                <span class="text-sm text-slate-600">
+                  {{ pago.fechaPago | date:'dd/MM/yyyy' }}
+                </span>
+                <p class="text-xs text-slate-400 mt-0.5">
+                  {{ pago.fechaPago | date:'HH:mm' }}
+                </p>
+              </td>
+
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold"
+                  [class]="badgeEstado(pago.estadoPago)">
+                  <span class="w-1.5 h-1.5 rounded-full bg-current shrink-0"></span>
+                  {{ pago.estadoPago }}
+                </span>
+              </td>
+
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-end">
+                  <button (click)="abrirModalPago(pago)" title="Editar pago"
+                    class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
+                    <i class="fa-solid fa-pen text-[10px]"></i> Editar
+                  </button>
+                </div>
+              </td>
+
+            </tr>
+          }
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs">
+      <p class="text-slate-400 font-bold uppercase tracking-widest">
+        Página {{ pagos().length > 0 ? paginaActual() + 1 : 0 }} de {{ totalPaginas() }}
+        · {{ totalElementos() }} pagos
+      </p>
+      <div class="flex gap-1">
+        <button
+          (click)="cambiarPagina(paginaActual() - 1)"
+          [disabled]="paginaActual() === 0"
+          class="w-8 h-8 flex items-center justify-center border border-slate-200 rounded-lg bg-white text-slate-400 hover:text-black disabled:opacity-50 disabled:cursor-not-allowed">
+          <i class="fa fa-angle-left"></i>
+        </button>
+        <button
+          class="w-8 h-8 flex items-center justify-center border border-slate-200 rounded-lg bg-black text-white font-bold shadow-sm">
+          {{ paginaActual() + 1 }}
+        </button>
+        <button
+          (click)="cambiarPagina(paginaActual() + 1)"
+          [disabled]="paginaActual() >= totalPaginas() - 1 || totalPaginas() === 0"
+          class="w-8 h-8 flex items-center justify-center border border-slate-200 rounded-lg bg-white text-slate-400 hover:text-black disabled:opacity-50 disabled:cursor-not-allowed">
+          <i class="fa fa-angle-right"></i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL -->
+  @if (modalPago() && pagoSeleccionado()) {
+    <app-modal-editar-pagos
+      [pagoId]="pagoSeleccionado().id"
+      (cerrar)="modalPago.set(false)"
+      (actualizado)="onActualizado()"/>
+  }
+
+</div>

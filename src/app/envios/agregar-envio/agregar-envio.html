@@ -189,136 +189,143 @@
 
       <!-- PRODUCTO -->
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-        <h3 class="text-sm font-extrabold text-black uppercase tracking-wide mb-4 flex items-center gap-2">
-          <i class="fa fa-box text-slate-400"></i> Producto
-        </h3>
-        <div class="flex flex-col gap-4">
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Tipo de producto</label>
-            <select
-              [(ngModel)]="form.producto.tipoProducto"
-              [disabled]="modoVer()"
-              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed">
-              <option value="">Seleccionar...</option>
-              <option>Caja</option>
-              <option>Bolsa</option>
-              <option>Paquete</option>
-              <option>Sobre</option>
-              <option>Otro</option>
-            </select>
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">N° de paquetes</label>
-            <input
-              [(ngModel)]="form.producto.numeroPaquetes"
-              [disabled]="modoVer()"
-              type="number"
-              min="1"
-              placeholder="1"
-              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"/>
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Descripción</label>
-            <textarea
-              [(ngModel)]="form.producto.descripcion"
-              [disabled]="modoVer()"
-              rows="3"
-              placeholder="Ej: Caja de cartón con ropa y zapatos..."
-              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all resize-none disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"></textarea>
-          </div>
-        </div>
-      </div>
+         <h3 class="text-sm font-extrabold text-black uppercase tracking-wide mb-4 flex items-center gap-2">
+           <i class="fa fa-box text-slate-400"></i> Producto
+         </h3>
+         <div class="flex flex-col gap-4">
+           <div class="flex flex-col gap-1.5">
+             <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Tipo de producto</label>
+             <select
+               [(ngModel)]="form.producto.tipoProductoId"
+               [disabled]="modoVer()"
+               class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed">
+               <option [value]="0">Seleccionar...</option>
+               @for (tipo of tiposProducto(); track tipo.id) {
+                 <option [value]="tipo.id">{{ tipo.nombre }}</option>
+               }
+             </select>
+           </div>
+           <div class="flex flex-col gap-1.5">
+             <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">N° de paquetes</label>
+             <input
+               [(ngModel)]="form.producto.numeroPaquetes"
+               [disabled]="modoVer()"
+               type="number"
+               min="1"
+               placeholder="1"
+               class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"/>
+           </div>
+           <div class="flex flex-col gap-1.5">
+             <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Descripción</label>
+             <textarea
+               [(ngModel)]="form.producto.descripcion"
+               [disabled]="modoVer()"
+               rows="3"
+               placeholder="Ej: Caja de cartón con ropa y zapatos..."
+               class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all resize-none disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"></textarea>
+           </div>
+         </div>
+       </div>
 
-      <!-- PAGO -->
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-        <h3 class="text-sm font-extrabold text-black uppercase tracking-wide mb-4 flex items-center gap-2">
-          <i class="fa fa-credit-card text-slate-400"></i> Pago
-        </h3>
-        <div class="flex flex-col gap-4">
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Monto (S/.)</label>
-            <input
-              [(ngModel)]="form.pago.monto"
-              [disabled]="modoVer()"
-              type="number"
-              min="0"
-              step="0.50"
-              placeholder="0.00"
-              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"/>
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Método de pago</label>
-            <select
-              [(ngModel)]="form.pago.metodoPago"
-              [disabled]="modoVer()"
-              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed">
-              <option value="">Seleccionar...</option>
-              <option value="EFECTIVO">Efectivo</option>
-              <option value="TRANSFERENCIA">Transferencia</option>
-            </select>
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Fecha de pago</label>
-            <input
-              [(ngModel)]="form.pago.fechaPago"
-              [disabled]="modoVer()"
-              type="datetime-local"
-              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"/>
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Estado del pago</label>
-            <select
-              [(ngModel)]="form.pago.estadoPago"
-              [disabled]="modoVer()"
-              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed">
-              <option [value]="EstadoPago.PAGADO">Pagado</option>
-              <option [value]="EstadoPago.PENDIENTE">Pendiente</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- RESUMEN -->
-      <div class="bg-slate-900 rounded-2xl p-6 text-white">
-        <h3 class="text-sm font-extrabold uppercase tracking-wide mb-4 text-slate-300">Resumen</h3>
-        <div class="flex flex-col gap-2 text-sm">
-          <div class="flex justify-between">
-            <span class="text-slate-400">Remitente</span>
-            <span class="font-medium truncate ml-4">{{ form.nombreRemitente || '—' }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-400">Destino</span>
-            <span class="font-medium">{{ form.provincia || '—' }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-400">Producto</span>
-            <span class="font-medium">{{ form.producto.tipoProducto || '—' }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-400">Estado</span>
-            <span class="font-medium">{{ form.estadoEnvio || '—' }}</span>
-          </div>
-          <div class="border-t border-slate-700 my-2"></div>
-          <div class="flex justify-between text-base">
-            <span class="text-slate-300 font-bold">Total</span>
-            <span class="font-extrabold text-white">S/. {{ form.pago.monto | number:'1.2-2' }}</span>
+       <!-- PAGO -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+          <h3 class="text-sm font-extrabold text-black uppercase tracking-wide mb-4 flex items-center gap-2">
+            <i class="fa fa-credit-card text-slate-400"></i> Pago
+          </h3>
+          <div class="flex flex-col gap-4">
+          
+            <!-- monto deshabilitado, calculado por el back -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">
+                Monto (S/.) <span class="text-slate-400 normal-case font-normal">— calculado automáticamente</span>
+              </label>
+              <input
+                type="number"
+                disabled
+                placeholder="Se calcula al guardar"
+                class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-400 cursor-not-allowed"/>
+            </div>
+          
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Método de pago</label>
+              <select
+                [(ngModel)]="form.pago.metodoPago"
+                [disabled]="modoVer()"
+                class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed">
+                <option value="">Seleccionar...</option>
+                <option value="EFECTIVO">Efectivo</option>
+                <option value="TRANSFERENCIA">Transferencia</option>
+              </select>
+            </div>
+          
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Fecha de pago</label>
+              <input
+                [(ngModel)]="form.pago.fechaPago"
+                [disabled]="modoVer()"
+                type="datetime-local"
+                class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"/>
+            </div>
+          
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Estado del pago</label>
+              <select
+                [(ngModel)]="form.pago.estadoPago"
+                [disabled]="modoVer()"
+                class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed">
+                <option [value]="EstadoPago.PAGADO">Pagado</option>
+                <option [value]="EstadoPago.PENDIENTE">Pendiente</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        <!-- botón solo en modo CREAR -->
-        @if (!modoVer()) {
-          <button
-            (click)="guardar()"
-            [disabled]="guardando()"
-            class="mt-5 w-full bg-white text-black py-2.5 rounded-xl text-sm font-bold hover:bg-slate-100 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
-            @if (guardando()) {
-              <i class="fa fa-spinner fa-spin"></i> Guardando...
-            } @else {
-              <i class="fa fa-floppy-disk"></i> Guardar envío
-            }
-          </button>
-        }
-      </div>
+       <!-- RESUMEN -->
+       <div class="bg-slate-900 rounded-2xl p-6 text-white">
+         <h3 class="text-sm font-extrabold uppercase tracking-wide mb-4 text-slate-300">Resumen</h3>
+         <div class="flex flex-col gap-2 text-sm">
+           <div class="flex justify-between">
+             <span class="text-slate-400">Remitente</span>
+             <span class="font-medium truncate ml-4">{{ form.nombreRemitente || '—' }}</span>
+           </div>
+           <div class="flex justify-between">
+             <span class="text-slate-400">Destino</span>
+             <span class="font-medium">{{ form.provincia || '—' }}</span>
+           </div>
+           <div class="flex justify-between">
+             <span class="text-slate-400">Producto</span>
+             <!-- muestra el nombre del tipo seleccionado en vez del id -->
+             <span class="font-medium">
+               {{ tiposProducto().find(t => t.id === form.producto.tipoProductoId)?.nombre || '—' }}
+             </span>
+           </div>
+           <div class="flex justify-between">
+             <span class="text-slate-400">Estado</span>
+             <span class="font-medium">{{ form.estadoEnvio || '—' }}</span>
+           </div>
+           <div class="border-t border-slate-700 my-2"></div>
+           <div class="flex justify-between text-base">
+             <span class="text-slate-300 font-bold">Total</span>
+             <!-- el monto se muestra después de guardar, antes muestra pendiente -->
+             <span class="font-extrabold text-white">
+               {{ form.pago.monto ? ('S/. ' + (form.pago.monto | number:'1.2-2')) : 'Se calcula al guardar' }}
+             </span>
+           </div>
+         </div>
+       
+         @if (!modoVer()) {
+           <button
+             (click)="guardar()"
+             [disabled]="guardando()"
+             class="mt-5 w-full bg-white text-black py-2.5 rounded-xl text-sm font-bold hover:bg-slate-100 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+             @if (guardando()) {
+               <i class="fa fa-spinner fa-spin"></i> Guardando...
+             } @else {
+               <i class="fa fa-floppy-disk"></i> Guardar envío
+             }
+           </button>
+         }
+       </div>
 
     </div>
   </div>

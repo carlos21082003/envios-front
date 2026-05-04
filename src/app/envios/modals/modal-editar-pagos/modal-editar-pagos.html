@@ -1,0 +1,86 @@
+<div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
+     (click)="cerrar.emit()">
+
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6"
+       (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-5">
+      <div>
+        <h3 class="text-base font-extrabold text-black">Editar pago</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Actualiza los datos del pago</p>
+      </div>
+      <button (click)="cerrar.emit()"
+        class="w-8 h-8 flex items-center cursor-pointer justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-black hover:bg-slate-50 transition-all">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+
+    @if (cargando()) {
+      <div class="py-8 text-center text-slate-400 text-sm">
+        <i class="fa fa-spinner fa-spin mr-2"></i> Cargando datos...
+      </div>
+    } @else {
+      <div class="flex flex-col gap-4 mb-5">
+    
+        <!-- monto solo lectura -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">
+            Monto (S/.) <span class="text-slate-400 normal-case font-normal">— calculado automáticamente</span>
+          </label>
+          <input
+            [value]="montoActual()"
+            type="number" disabled
+            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-500 cursor-not-allowed"/>
+        </div>
+    
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Método de pago</label>
+          <select [(ngModel)]="form.metodoPago"
+            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white">
+            <option value="EFECTIVO">Efectivo</option>
+            <option value="TRANSFERENCIA">Transferencia</option>
+          </select>
+        </div>
+    
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Fecha de pago</label>
+          <input [(ngModel)]="form.fechaPago" type="datetime-local"
+            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+        </div>
+    
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Estado del pago</label>
+          <select [(ngModel)]="form.estadoPago"
+            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white">
+            <option [value]="EstadoPago.PAGADO">Pagado</option>
+            <option [value]="EstadoPago.PENDIENTE">Pendiente</option>
+          </select>
+        </div>
+    
+      </div>
+    }
+
+    @if (error()) {
+      <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 flex items-center gap-2">
+        <i class="fa-solid fa-circle-exclamation"></i> {{ error() }}
+      </div>
+    }
+
+    <div class="flex gap-2">
+      <button (click)="cerrar.emit()"
+        class="flex-1 py-2.5 cursor-pointer border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">
+        Cancelar
+      </button>
+      <button (click)="guardar()" [disabled]="guardando() || cargando()"
+        class="flex-1 py-2.5 cursor-pointer bg-black text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+        @if (guardando()) {
+          <i class="fa fa-spinner fa-spin"></i> Guardando...
+        } @else {
+          Actualizar
+        }
+      </button>
+    </div>
+
+  </div>
+</div>

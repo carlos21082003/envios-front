@@ -5,6 +5,8 @@ import { EnviosService } from '../service/envios-service';
 import { EstadoPago } from '../../pagos/models/estado-pago';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { TipoProductoService } from '../../productos/service/tipo-producto-service';
+import { TipoProductoDTO } from '../../productos/models/tipo-producto';
 
 @Component({
   selector: 'app-agregar-envio',
@@ -13,18 +15,18 @@ import { CommonModule } from '@angular/common';
   styleUrl: './agregar-envio.css',
 })
 export class AgregarEnvio {
-  private enviosService = inject(EnviosService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute); 
+ private enviosService       = inject(EnviosService);
+  private router              = inject(Router);
+  private tipoProductoService = inject(TipoProductoService);
+  private route               = inject(ActivatedRoute);
 
-  guardando  = signal(false);
-  cargando   = signal(false);
-  errorGuardar = signal<string | null>(null);
-  exitoso    = signal(false);
-
-  //  Modo del formulario 
-  modoVer  = signal(false); 
-  envioId  = signal<number | null>(null);
+  tiposProducto = signal<TipoProductoDTO[]>([]);
+  guardando     = signal(false);
+  cargando      = signal(false);
+  errorGuardar  = signal<string | null>(null);
+  exitoso       = signal(false);
+  modoVer       = signal(false);
+  envioId       = signal<number | null>(null);
 
   EstadoEnvio = EstadoEnvio;
   EstadoPago  = EstadoPago;
@@ -40,15 +42,15 @@ export class AgregarEnvio {
     fechaEnvio:         '',
     estadoEnvio:        EstadoEnvio.PORSALIR,
     producto: {
-      tipoProducto:   '',
-      descripcion:    '',
-      numeroPaquetes: 1,
+      tipoProductoId:  0,
+      descripcion:     '',
+      numeroPaquetes:  1,
     },
     pago: {
-      monto:       0,
-      metodoPago:  '',
-      fechaPago:   '',
-      estadoPago:  EstadoPago.PAGADO,
+      monto:      0,      // ← existe para que TypeScript no se queje y para mostrarlo en el resumen
+      metodoPago: '',
+      fechaPago:  '',
+      estadoPago: EstadoPago.PAGADO,
     }
   };
 
@@ -59,8 +61,9 @@ export class AgregarEnvio {
   ];
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id'); 
+    this.cargarTiposProducto();
 
+    const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.modoVer.set(true);
       this.envioId.set(Number(id));
@@ -68,12 +71,20 @@ export class AgregarEnvio {
     }
   }
 
+  cargarTiposProducto(): void {
+   this.tipoProductoService.listarTipoProductos().subscribe({
+     next: (res) => {
+       console.log('respuesta tipos:', res); 
+       this.tiposProducto.set(res.content);
+     },
+     error: () => console.error('Error al cargar tipos de producto')
+   });
+  }
+
   cargarEnvio(id: number): void {
     this.cargando.set(true);
-
     this.enviosService.getEnvioById(id).subscribe({
       next: (envio) => {
-        // Rellenar el formulario con los datos del envío
         this.form = {
           nombreRemitente:    envio.nombreRemitente,
           dniRemitente:       envio.dniRemitente,
@@ -82,15 +93,15 @@ export class AgregarEnvio {
           provincia:          envio.provincia,
           horaSalida:         envio.horaSalida,
           horaLlegada:        envio.horaLlegada,
-          fechaEnvio:         envio.fechaEnvio?.slice(0, 16), 
+          fechaEnvio:         envio.fechaEnvio?.slice(0, 16),
           estadoEnvio:        envio.estadoEnvio,
           producto: {
-            tipoProducto:   envio.producto.tipoProducto,
-            descripcion:    envio.producto.descripcion,
-            numeroPaquetes: envio.producto.numeroPaquetes,
+            tipoProductoId:  envio.producto.tipoProductoId,
+            descripcion:     envio.producto.descripcion,
+            numeroPaquetes:  envio.producto.numeroPaquetes,
           },
           pago: {
-            monto:      envio.pago.monto,
+            monto:      envio.pago.monto,   // ← viene del back al cargar
             metodoPago: envio.pago.metodoPago,
             fechaPago:  envio.pago.fechaPago?.slice(0, 16),
             estadoPago: envio.pago.estadoPago,
@@ -111,17 +122,21 @@ export class AgregarEnvio {
     this.guardando.set(true);
     this.errorGuardar.set(null);
 
+    // monto NO se manda al back, lo calcula el servidor
     const dto = {
       ...this.form,
       fechaEnvio: new Date(this.form.fechaEnvio).toISOString(),
       pago: {
-        ...this.form.pago,
-        fechaPago: new Date(this.form.pago.fechaPago).toISOString(),
+        metodoPago: this.form.pago.metodoPago,
+        fechaPago:  new Date(this.form.pago.fechaPago).toISOString(),
+        estadoPago: this.form.pago.estadoPago,
       }
     };
 
     this.enviosService.guardarEnvio(dto).subscribe({
-      next: () => {
+      next: (envioGuardado) => {
+        // actualizar el monto con el valor calculado que devuelve el back
+        this.form.pago.monto = envioGuardado.pago.monto;
         this.exitoso.set(true);
         this.guardando.set(false);
         setTimeout(() => this.router.navigate(['/envios']), 1500);

@@ -3,6 +3,7 @@ import { environment } from '../../enviroment/enviroment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { catchError, Observable } from 'rxjs';
 import { Envios } from '../models/envios';
+import { EstadoEnvio } from '../models/estado-envio';
 
 @Injectable({
   providedIn: 'root',
@@ -54,4 +55,14 @@ export class EnviosService {
       })
     );
   }
+
+  actualizarEnvio(id: number, envio: any): Observable<any> {
+    return this.http.put<any>(`${this.urlEnvios}/${id}`, envio).pipe(
+      catchError((error) => {
+        console.error('Error al actualizar envío:', error);
+        throw error;
+      })
+    );
+  }
+
 }

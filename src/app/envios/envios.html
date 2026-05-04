@@ -94,18 +94,27 @@
                 <!-- ── ACCIONES ── -->
                 <td class="px-6 py-4">
                   <div class="flex items-center justify-end gap-1.5">
-                    <button (click)="verEnvio(envio.id)" title="Ver envío" class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
+                  
+                    <button (click)="verEnvio(envio.id)" title="Ver envío"
+                      class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
                       <i class="fa-solid fa-eye text-[10px]"></i> Ver
                     </button>
-                    <button title="Editar datos de envío" class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
+                  
+                    <button (click)="abrirModalEnvio(envio)" title="Editar envío"
+                      class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
                       <i class="fa-solid fa-edit text-[10px]"></i> Editar
                     </button>
-                    <button title="Actualizar estado del pago" class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
+                  
+                    <button (click)="abrirModalPago(envio)" title="Editar pago"
+                      class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
                       <i class="fa-solid fa-credit-card text-[10px]"></i> Pago
                     </button>
-                    <button title="Actualizar estado del envío" class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
-                      <i class="fa-solid fa-truck text-[10px]"></i> Estado
+                  
+                    <button (click)="abrirModalProducto(envio)" title="Editar producto"
+                      class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
+                      <i class="fa-solid fa-box text-[10px]"></i> Producto
                     </button>
+                  
                   </div>
                 </td>
               </tr>
@@ -155,4 +164,26 @@
       </div>
     </div>
   </div>
+
+  <!-- MODALES -->
+    @if (modalEnvio() && envioSeleccionado()) {
+      <app-modal-editar-envio
+        [envioId]="envioSeleccionado().id"
+        (cerrar)="modalEnvio.set(false)"
+        (actualizado)="onActualizado()"/>
+    }
+    
+    @if (modalPago() && envioSeleccionado()) {
+      <app-modal-editar-pagos
+        [pagoId]="envioSeleccionado().pago.id"
+        (cerrar)="modalPago.set(false)"
+        (actualizado)="onActualizado()"/>
+    }
+    
+    @if (modalProducto() && envioSeleccionado()) {
+      <app-modal-editar-productos
+        [productoId]="envioSeleccionado().producto.id"
+        (cerrar)="modalProducto.set(false)"
+        (actualizado)="onActualizado()"/>
+    }
 </div>

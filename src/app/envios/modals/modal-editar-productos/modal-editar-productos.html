@@ -21,7 +21,7 @@
       </div>
     } @else {
       <div class="flex flex-col gap-4 mb-5">
-    
+
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Tipo de producto</label>
           <select [(ngModel)]="form.tipoProductoId"
@@ -32,19 +32,19 @@
             }
           </select>
         </div>
-    
+
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">N° de paquetes</label>
           <input [(ngModel)]="form.numeroPaquetes" type="number" min="1"
             class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
         </div>
-    
+
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Descripción</label>
           <textarea [(ngModel)]="form.descripcion" rows="3"
             class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all resize-none"></textarea>
         </div>
-    
+
       </div>
     }
 

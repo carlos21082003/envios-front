@@ -1,10 +1,11 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink, RouterModule } from '@angular/router';
 import { EnviosService } from './service/envios-service';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ModalEditarEnvio } from "./modals/modal-editar-envio/modal-editar-envio";
 import { ModalEditarPagos } from "./modals/modal-editar-pagos/modal-editar-pagos";
 import { ModalEditarProductos } from "./modals/modal-editar-productos/modal-editar-productos";
+import { EstadoEnvio } from './models/estado-envio';
 
 @Component({
   selector: 'app-envios',
@@ -16,16 +17,24 @@ export class Envios implements OnInit {
   private enviosService = inject(EnviosService);
   private router        = inject(Router);
 
+  // Lista 
   envios        = signal<any[]>([]);
   paginaActual  = signal<number>(0);
   totalPaginas  = signal<number>(0);
+  totalElementos = signal<number>(0);
   cargando      = signal<boolean>(true);
   errorBusqueda = signal<boolean>(false);
 
+  // ── Stats computed 
+  totalEnvios   = computed(() => this.totalElementos());
+  enTransito    = computed(() => this.envios().filter(e => e.estadoEnvio === EstadoEnvio.ENTRANSITO).length);
+  porSalir      = computed(() => this.envios().filter(e => e.estadoEnvio === EstadoEnvio.PORSALIR).length);
+  entregados    = computed(() => this.envios().filter(e => e.estadoEnvio === EstadoEnvio.ENTREGADO).length);
+
+  // Modales 
   modalEnvio    = signal(false);
   modalPago     = signal(false);
   modalProducto = signal(false);
-
   envioSeleccionado = signal<any>(null);
 
   ngOnInit(): void {
@@ -40,6 +49,7 @@ export class Envios implements OnInit {
       next: (response) => {
         this.envios.set(response.content);
         this.totalPaginas.set(response.totalPages);
+        this.totalElementos.set(response.totalElements);
         this.cargando.set(false);
       },
       error: () => {
@@ -62,6 +72,7 @@ export class Envios implements OnInit {
       next: (response) => {
         this.envios.set([response]);
         this.totalPaginas.set(1);
+        this.totalElementos.set(1);
         this.paginaActual.set(0);
         this.cargando.set(false);
       },
@@ -84,6 +95,28 @@ export class Envios implements OnInit {
     this.router.navigate(['/envios/ver', id]);
   }
 
+  // ── Badge estado ───────────────────────────
+  badgeClase(estado: EstadoEnvio): string {
+    const clases: Record<string, string> = {
+      [EstadoEnvio.ENTRANSITO]: 'bg-black text-white',
+      [EstadoEnvio.PORSALIR]:   'bg-slate-100 text-slate-600',
+      [EstadoEnvio.ENTREGADO]:  'bg-green-100 text-green-700',
+      [EstadoEnvio.SALIO]:      'bg-blue-100 text-blue-700',
+    };
+    return clases[estado] ?? 'bg-slate-100 text-slate-500';
+  }
+
+  badgeTexto(estado: EstadoEnvio): string {
+    const textos: Record<string, string> = {
+      [EstadoEnvio.ENTRANSITO]: 'En tránsito',
+      [EstadoEnvio.PORSALIR]:   'Por salir',
+      [EstadoEnvio.ENTREGADO]:  'Entregado',
+      [EstadoEnvio.SALIO]:      'Salió',
+    };
+    return textos[estado] ?? estado;
+  }
+
+  // ── Modales ────────────────────────────────
   abrirModalEnvio(envio: any): void {
     this.envioSeleccionado.set(envio);
     this.modalEnvio.set(true);

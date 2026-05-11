@@ -1,0 +1,499 @@
+<div class="p-6 min-h-screen text-slate-900">
+
+  <!-- HEADER -->
+  <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+    <div>
+      <h2 class="text-2xl font-extrabold text-black">Solicitudes</h2>
+      <p class="text-slate-500 text-sm">Gestiona las solicitudes de recojo y delivery por sede.</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="flex items-center gap-2">
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wide whitespace-nowrap">Sede:</label>
+        <select
+          [ngModel]="sedeSeleccionada()"
+          (ngModelChange)="onCambiarSede($event)"
+          class="cursor-pointer px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all bg-white font-semibold">
+          @for (sede of sedes(); track sede.id) {
+            <option [value]="sede.id">{{ sede.nombre }}</option>
+          }
+        </select>
+      </div>
+      <button
+        (click)="mostrarModalRecojo.set(true)"
+        class="cursor-pointer bg-white border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all flex items-center gap-2">
+        <i class="fa fa-box text-slate-400"></i> Nuevo recojo
+      </button>
+      <button
+        (click)="mostrarModalDelivery.set(true)"
+        class="cursor-pointer bg-black text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-800 transition-all flex items-center gap-2">
+        <i class="fa fa-motorcycle"></i> Nuevo delivery
+      </button>
+    </div>
+  </div>
+
+  <!-- ALERTAS -->
+  @if (exitoso()) {
+    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-700 text-sm font-medium">
+      <i class="fa fa-circle-check text-green-500 text-lg"></i> {{ exitoso() }}
+    </div>
+  }
+  @if (errorMsg()) {
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700 text-sm font-medium">
+      <i class="fa fa-circle-exclamation text-red-400 text-lg"></i> {{ errorMsg() }}
+    </div>
+  }
+
+  <!-- STATS -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
+      <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center">
+        <i class="fa fa-clock text-slate-500"></i>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">Pendientes</p>
+        <p class="text-xl font-extrabold text-black">{{ totalPendientes() }}</p>
+      </div>
+    </div>
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
+      <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center">
+        <i class="fa fa-truck text-white"></i>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">Aceptadas</p>
+        <p class="text-xl font-extrabold text-black">{{ totalAceptadas() }}</p>
+      </div>
+    </div>
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
+      <div class="w-10 h-10 bg-black rounded-xl flex items-center justify-center">
+        <i class="fa fa-circle-check text-white"></i>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">Completadas</p>
+        <p class="text-xl font-extrabold text-black">{{ totalCompletadas() }}</p>
+      </div>
+    </div>
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
+      <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
+        <i class="fa fa-ban text-red-500"></i>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">Rechazadas</p>
+        <p class="text-xl font-extrabold text-black">{{ totalRechazadas() }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+    <!-- FILTROS -->
+    <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2 overflow-x-auto">
+      @for (opcion of [
+        { valor: 'TODOS',      label: 'Todos' },
+        { valor: 'PENDIENTE',  label: 'Pendientes' },
+        { valor: 'ACEPTADA',   label: 'Aceptadas' },
+        { valor: 'COMPLETADA', label: 'Completadas' },
+        { valor: 'RECHAZADA',  label: 'Rechazadas' }
+      ]; track opcion.valor) {
+        <button
+          (click)="onCambiarFiltro(opcion.valor)"
+          [class]="estadoFiltro() === opcion.valor
+            ? 'cursor-pointer px-4 py-2 rounded-xl text-xs font-bold bg-black text-white transition-all whitespace-nowrap'
+            : 'cursor-pointer px-4 py-2 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all whitespace-nowrap'">
+          {{ opcion.label }}
+        </button>
+      }
+      <span class="ml-auto text-xs text-slate-400 font-medium whitespace-nowrap">
+        {{ totalElementos() }} solicitudes
+      </span>
+    </div>
+
+    @if (cargando()) {
+      <div class="p-10 flex items-center justify-center gap-3 text-slate-500 text-sm">
+        <i class="fa fa-spinner fa-spin text-slate-400 text-lg"></i> Cargando...
+      </div>
+    }
+
+    @if (!cargando() && solicitudes().length === 0) {
+      <div class="p-10 flex flex-col items-center justify-center gap-2 text-slate-400">
+        <i class="fa fa-inbox text-4xl mb-2"></i>
+        <p class="text-sm font-medium">No hay solicitudes para mostrar.</p>
+      </div>
+    }
+
+    @if (!cargando() && solicitudes().length > 0) {
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-100 bg-slate-50">
+              <th class="text-left px-5 py-3 text-xs font-extrabold text-slate-500 uppercase tracking-wide">Tipo</th>
+              <th class="text-left px-5 py-3 text-xs font-extrabold text-slate-500 uppercase tracking-wide">Solicitante</th>
+              <th class="text-left px-5 py-3 text-xs font-extrabold text-slate-500 uppercase tracking-wide hidden md:table-cell">Dirección</th>
+              <th class="text-left px-5 py-3 text-xs font-extrabold text-slate-500 uppercase tracking-wide hidden lg:table-cell">Fecha</th>
+              <th class="text-left px-5 py-3 text-xs font-extrabold text-slate-500 uppercase tracking-wide hidden lg:table-cell">Envío / Destino</th>
+              <th class="text-center px-5 py-3 text-xs font-extrabold text-slate-500 uppercase tracking-wide">Estado</th>
+              <th class="text-right px-5 py-3 text-xs font-extrabold text-slate-500 uppercase tracking-wide">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            @for (solicitud of solicitudes(); track solicitud.id) {
+              <tr class="hover:bg-slate-50 transition-colors">
+
+                <td class="px-5 py-4">
+                  <span [class]="'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border ' + badgeTipoClase(solicitud.tipo)">
+                    <i [class]="'fa ' + badgeTipoIcono(solicitud.tipo)"></i>
+                    {{ solicitud.tipo === TipoSolicitud.RECOJO ? 'Recojo' : 'Delivery' }}
+                  </span>
+                </td>
+
+                <td class="px-5 py-4">
+                  <p class="font-semibold text-black">{{ solicitud.nombreSolicitante }}</p>
+                  <p class="text-xs text-slate-400 mt-0.5">DNI {{ solicitud.dniSolicitante }} · {{ solicitud.telefono }}</p>
+                </td>
+
+                <td class="px-5 py-4 hidden md:table-cell">
+                  <p class="text-slate-600 text-xs max-w-45 truncate">{{ solicitud.direccion }}</p>
+                  @if (solicitud.referencia) {
+                    <p class="text-slate-400 text-xs mt-0.5 truncate max-w-45">{{ solicitud.referencia }}</p>
+                  }
+                </td>
+
+                <td class="px-5 py-4 hidden lg:table-cell">
+                  <p class="text-slate-600 text-xs">{{ solicitud.fechaSolicitada | date:'dd/MM/yyyy HH:mm' }}</p>
+                  @if (solicitud.fechaAtencion) {
+                    <p class="text-slate-400 text-xs mt-0.5">
+                      <i class="fa fa-circle-check text-slate-400 mr-1"></i>
+                      {{ solicitud.fechaAtencion | date:'dd/MM/yyyy HH:mm' }}
+                    </p>
+                  }
+                </td>
+
+                <td class="px-5 py-4 hidden lg:table-cell">
+                  @if (solicitud.tipo === TipoSolicitud.DELIVERY && solicitud.envioId) {
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 text-slate-600 text-xs font-bold rounded-lg">
+                      <i class="fa fa-box text-slate-400 text-xs"></i> #{{ solicitud.envioId }}
+                    </span>
+                  }
+                  @if (solicitud.tipo === TipoSolicitud.RECOJO && solicitud.sedeDestinoNombre) {
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 text-slate-600 text-xs font-bold rounded-lg">
+                      <i class="fa fa-building text-slate-400 text-xs"></i> {{ solicitud.sedeDestinoNombre }}
+                    </span>
+                  }
+                  @if (!solicitud.envioId && !solicitud.sedeDestinoNombre) {
+                    <span class="text-slate-400 text-xs">—</span>
+                  }
+                </td>
+
+                <td class="px-5 py-4 text-center">
+                  <span [class]="'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border ' + badgeEstadoClase(solicitud.estado!)">
+                    {{ badgeEstadoTexto(solicitud.estado!) }}
+                  </span>
+                  @if (solicitud.estado === EstadoSolicitud.RECHAZADA && solicitud.motivoRechazo) {
+                    <p class="text-xs text-red-400 mt-1 max-w-30 truncate mx-auto" [title]="solicitud.motivoRechazo">
+                      {{ solicitud.motivoRechazo }}
+                    </p>
+                  }
+                </td>
+
+                <td class="px-5 py-4 text-right">
+                  <div class="flex items-center justify-end gap-1.5">
+
+                    @if (solicitud.estado === EstadoSolicitud.PENDIENTE) {
+                      <button (click)="aceptar(solicitud.id!)"
+                        class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-black transition-all">
+                        <i class="fa fa-check text-xs"></i> Aceptar
+                      </button>
+                      <button (click)="abrirModalRechazo(solicitud)"
+                        class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 text-xs font-bold hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all">
+                        <i class="fa fa-xmark text-xs"></i> Rechazar
+                      </button>
+                    }
+
+                    @if (solicitud.estado === EstadoSolicitud.ACEPTADA) {
+                      <button (click)="iniciarCompletar(solicitud)"
+                        class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black text-white text-xs font-bold hover:bg-slate-800 transition-all">
+                        <i class="fa fa-circle-check text-xs"></i>
+                        {{ solicitud.tipo === TipoSolicitud.RECOJO ? 'Completar y crear envío' : 'Completar' }}
+                      </button>
+                      <button (click)="abrirModalRechazo(solicitud)"
+                        class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 text-xs font-bold hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all">
+                        <i class="fa fa-xmark text-xs"></i> Rechazar
+                      </button>
+                    }
+
+                    @if (solicitud.estado === EstadoSolicitud.COMPLETADA || solicitud.estado === EstadoSolicitud.RECHAZADA) {
+                      <span class="text-xs text-slate-400 font-medium">Sin acciones</span>
+                    }
+
+                  </div>
+                </td>
+
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINACIÓN -->
+      @if (totalPaginas() > 1) {
+        <div class="px-5 py-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500">
+          <span class="text-xs font-medium">
+            Página {{ paginaActual() + 1 }} de {{ totalPaginas() }} · {{ totalElementos() }} solicitudes
+          </span>
+          <div class="flex items-center gap-1">
+            <button (click)="cambiarPagina(paginaActual() - 1)" [disabled]="paginaActual() === 0"
+              class="cursor-pointer px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              <i class="fa fa-chevron-left text-xs"></i>
+            </button>
+            @for (p of [].constructor(totalPaginas()); track $index) {
+              <button (click)="cambiarPagina($index)"
+                [class]="$index === paginaActual()
+                  ? 'cursor-pointer px-3 py-1.5 rounded-lg bg-black text-white font-bold text-xs'
+                  : 'cursor-pointer px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-xs transition-all'">
+                {{ $index + 1 }}
+              </button>
+            }
+            <button (click)="cambiarPagina(paginaActual() + 1)" [disabled]="paginaActual() === totalPaginas() - 1"
+              class="cursor-pointer px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              <i class="fa fa-chevron-right text-xs"></i>
+            </button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ -->
+<!-- MODAL RECHAZO                     -->
+<!-- ══════════════════════════════════ -->
+@if (mostrarModalRechazo()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm cursor-pointer" (click)="cerrarModalRechazo()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md">
+      <div class="flex items-start justify-between p-6 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center shrink-0">
+            <i class="fa fa-xmark text-red-500"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-extrabold text-black">Rechazar solicitud</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Indica el motivo del rechazo.</p>
+          </div>
+        </div>
+        <button (click)="cerrarModalRechazo()"
+          class="cursor-pointer p-2 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-black transition-all">
+          <i class="fa fa-xmark text-lg"></i>
+        </button>
+      </div>
+      <div class="p-6 flex flex-col gap-4">
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-1">
+          <p class="text-sm font-bold text-black">{{ solicitudArechazar()?.nombreSolicitante }}</p>
+          <p class="text-xs text-slate-500">{{ solicitudArechazar()?.direccion }}</p>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Motivo del rechazo</label>
+          <textarea
+            [ngModel]="motivoRechazo()"
+            (ngModelChange)="motivoRechazo.set($event)"
+            rows="3"
+            placeholder="Ej: Dirección fuera del área de cobertura..."
+            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all resize-none">
+          </textarea>
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2 px-6 py-4 border-t border-slate-100">
+        <button (click)="cerrarModalRechazo()"
+          class="cursor-pointer px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50 transition-all">
+          Cancelar
+        </button>
+        <button (click)="confirmarRechazo()" [disabled]="procesando()"
+          class="cursor-pointer bg-red-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-red-700 transition-all flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+          @if (procesando()) { <i class="fa fa-spinner fa-spin"></i> Rechazando... }
+          @else { <i class="fa fa-xmark"></i> Confirmar rechazo }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══════════════════════════════════ -->
+<!-- MODAL COMPLETAR RECOJO            -->
+<!-- ══════════════════════════════════ -->
+@if (mostrarModalCompletar()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm cursor-pointer"
+      (click)="mostrarModalCompletar.set(false)"></div>
+
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
+
+      <!-- HEADER -->
+      <div class="flex items-start justify-between p-6 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-black flex items-center justify-center shrink-0">
+            <i class="fa fa-box text-white"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-extrabold text-black">Completar recojo y crear envío</h3>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Ingresa los datos del envío que se generará automáticamente.
+            </p>
+          </div>
+        </div>
+        <button (click)="mostrarModalCompletar.set(false)"
+          class="cursor-pointer p-2 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-black transition-all">
+          <i class="fa fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- BODY -->
+      <div class="p-6 flex flex-col gap-4">
+
+        <!-- INFO SOLICITUD -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-1">
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Remitente (del recojo)</p>
+          <p class="text-sm font-bold text-black">{{ solicitudACompletar()?.nombreSolicitante }}</p>
+          <p class="text-xs text-slate-500">DNI {{ solicitudACompletar()?.dniSolicitante }} · {{ solicitudACompletar()?.telefono }}</p>
+          <p class="text-xs text-slate-500 mt-0.5">
+            <i class="fa fa-location-dot mr-1"></i>{{ solicitudACompletar()?.direccion }}
+          </p>
+        </div>
+
+        @if (errorCompletar()) {
+          <div class="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-red-700 text-xs font-medium">
+            <i class="fa fa-circle-exclamation text-red-400"></i> {{ errorCompletar() }}
+          </div>
+        }
+
+        <!-- DESTINATARIO -->
+        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wide">
+          <i class="fa fa-location-dot mr-1"></i> Destinatario
+        </p>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Nombre <span class="text-red-400">*</span></label>
+            <input [(ngModel)]="completarForm.nombreDestinatario" type="text" placeholder="Nombre completo"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">DNI <span class="text-red-400">*</span></label>
+            <input [(ngModel)]="completarForm.dniDestinatario" type="text" maxlength="8" placeholder="12345678"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+          </div>
+          <div class="flex flex-col gap-1.5 col-span-2">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Provincia destino <span class="text-red-400">*</span></label>
+            <select [(ngModel)]="completarForm.provincia"
+              class="cursor-pointer px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white">
+              <option value="">Seleccionar provincia...</option>
+              @for (prov of provincias; track prov) {
+                <option [value]="prov">{{ prov }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- HORARIO -->
+        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wide">
+          <i class="fa fa-clock mr-1"></i> Horario
+        </p>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Hora salida</label>
+            <input [(ngModel)]="completarForm.horaSalida" type="time"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Hora llegada</label>
+            <input [(ngModel)]="completarForm.horaLlegada" type="time"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+          </div>
+        </div>
+
+        <!-- PRODUCTO -->
+        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wide">
+          <i class="fa fa-box mr-1"></i> Producto
+        </p>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Tipo <span class="text-red-400">*</span></label>
+            <select [(ngModel)]="completarForm.tipoProductoId"
+              class="cursor-pointer px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white">
+              <option [value]="0">Seleccionar...</option>
+              @for (tipo of tiposProducto(); track tipo.id) {
+                <option [value]="tipo.id">{{ tipo.nombre }}</option>
+              }
+            </select>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">N° paquetes</label>
+            <input [(ngModel)]="completarForm.numeroPaquetes" type="number" min="1"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+          </div>
+        </div>
+
+        <!-- PAGO -->
+        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wide">
+          <i class="fa fa-credit-card mr-1"></i> Pago
+        </p>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Método <span class="text-red-400">*</span></label>
+            <select [(ngModel)]="completarForm.metodoPago"
+              class="cursor-pointer px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white">
+              <option value="">Seleccionar...</option>
+              <option value="EFECTIVO">Efectivo</option>
+              <option value="TRANSFERENCIA">Transferencia</option>
+              <option value="PAGADOALRECOGER">Pagado al recoger</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Estado pago</label>
+            <select [(ngModel)]="completarForm.estadoPago"
+              class="cursor-pointer px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white">
+              <option value="PAGADO">Pagado</option>
+              <option value="PENDIENTE">Pendiente</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- NOTA -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex gap-2 text-xs text-slate-500">
+          <i class="fa fa-circle-info mt-0.5 shrink-0"></i>
+          El envío se creará con el solicitante como remitente y quedará en estado <span class="font-bold text-black">Por salir</span>.
+        </div>
+
+      </div>
+
+      <!-- FOOTER -->
+      <div class="flex items-center justify-end gap-2 px-6 py-4 border-t border-slate-100">
+        <button (click)="mostrarModalCompletar.set(false)"
+          class="cursor-pointer px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50 transition-all">
+          Cancelar
+        </button>
+        <button (click)="confirmarCompletar()" [disabled]="guardandoCompletar()"
+          class="cursor-pointer bg-black text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-slate-800 transition-all flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+          @if (guardandoCompletar()) { <i class="fa fa-spinner fa-spin"></i> Creando envío... }
+          @else { <i class="fa fa-floppy-disk"></i> Completar y crear envío }
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- MODALES CREAR -->
+@if (mostrarModalRecojo()) {
+  <app-modal-solicitar-recojo
+    [sedes]="sedes()"
+    [sedeIdActual]="sedeSeleccionada()"
+    (guardado)="onGuardado()"
+    (cerrar)="mostrarModalRecojo.set(false)"/>
+}
+
+@if (mostrarModalDelivery()) {
+  <app-modal-solicitar-delivery
+    [sedes]="sedes()"
+    [sedeIdActual]="sedeSeleccionada()"
+    (guardado)="onGuardado()"
+    (cerrar)="mostrarModalDelivery.set(false)"/>
+}

@@ -13,7 +13,7 @@ import { PagosService } from '../../../pagos/service/pagos-service';
 export class ModalEditarPagos implements OnInit {
   private pagosService = inject(PagosService);
 
-   pagoId      = input.required<number>();
+  pagoId      = input.required<number>();
   cerrar      = output<void>();
   actualizado = output<void>();
 

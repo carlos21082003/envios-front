@@ -1,8 +1,8 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject, input, OnInit, output, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { EstadoEnvio } from '../../models/estado-envio';
 import { EnviosService } from '../../service/envios-service';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-modal-editar-envio',
@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './modal-editar-envio.css',
 })
 export class ModalEditarEnvio implements OnInit {
-  private enviosService = inject(EnviosService);
+   private enviosService = inject(EnviosService);
 
   envioId     = input.required<number>();
   cerrar      = output<void>();
@@ -29,30 +29,34 @@ export class ModalEditarEnvio implements OnInit {
   ];
 
   form = {
-    nombreRemitente:    '',
-    dniRemitente:       '',
-    nombreDestinatario: '',
-    dniDestinatario:    '',
-    provincia:          '',
-    horaSalida:         '',
-    horaLlegada:        '',
-    fechaEnvio:         '',
-    estadoEnvio:        EstadoEnvio.PORSALIR,
+    nombreRemitente:         '',
+    dniRemitente:            '',
+    nombreDestinatario:      '',
+    dniDestinatario:         '',
+    provincia:               '',
+    horaSalida:              '',
+    horaLlegada:             '',
+    fechaEnvio:              '',
+    estadoEnvio:             EstadoEnvio.PORSALIR,
+    nombrePersonaAutorizada: '',
+    dniPersonaAutorizada:    '',
   };
 
   ngOnInit(): void {
     this.enviosService.getEnvioById(this.envioId()).subscribe({
       next: (envio) => {
         this.form = {
-          nombreRemitente:    envio.nombreRemitente,
-          dniRemitente:       envio.dniRemitente,
-          nombreDestinatario: envio.nombreDestinatario,
-          dniDestinatario:    envio.dniDestinatario,
-          provincia:          envio.provincia,
-          horaSalida:         envio.horaSalida,
-          horaLlegada:        envio.horaLlegada,
-          fechaEnvio:         envio.fechaEnvio?.slice(0, 16),
-          estadoEnvio:        envio.estadoEnvio,
+          nombreRemitente:         envio.nombreRemitente,
+          dniRemitente:            envio.dniRemitente,
+          nombreDestinatario:      envio.nombreDestinatario,
+          dniDestinatario:         envio.dniDestinatario,
+          provincia:               envio.provincia,
+          horaSalida:              envio.horaSalida,
+          horaLlegada:             envio.horaLlegada,
+          fechaEnvio:              envio.fechaEnvio?.slice(0, 16) ?? '',
+          estadoEnvio:             envio.estadoEnvio,
+          nombrePersonaAutorizada: envio.nombrePersonaAutorizada ?? '',
+          dniPersonaAutorizada:    envio.dniPersonaAutorizada ?? '',
         };
         this.cargando.set(false);
       },
@@ -69,7 +73,9 @@ export class ModalEditarEnvio implements OnInit {
 
     const dto = {
       ...this.form,
-      fechaEnvio: new Date(this.form.fechaEnvio).toISOString(),
+      fechaEnvio:              new Date(this.form.fechaEnvio).toISOString(),
+      nombrePersonaAutorizada: this.form.nombrePersonaAutorizada || null,
+      dniPersonaAutorizada:    this.form.dniPersonaAutorizada || null,
     };
 
     this.enviosService.actualizarEnvio(this.envioId(), dto).subscribe({

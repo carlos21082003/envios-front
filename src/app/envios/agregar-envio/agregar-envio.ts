@@ -1,16 +1,18 @@
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
-import { EstadoEnvio } from '../models/estado-envio';
-import { ActivatedRoute, Router } from '@angular/router';
-import { EnviosService } from '../service/envios-service';
-import { EstadoPago } from '../../pagos/models/estado-pago';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { TipoProductoService } from '../../productos/service/tipo-producto-service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { EstadoPago } from '../../pagos/models/estado-pago';
 import { TipoProductoDTO } from '../../productos/models/tipo-producto';
+import { TipoProductoService } from '../../productos/service/tipo-producto-service';
+import { EstadoEnvio } from '../models/estado-envio';
+import { EnviosService } from '../service/envios-service';
+import { SedeDTO } from '../../sede/models/sede';
+import { SedeService } from '../../sede/service/sede-service';
 
 @Component({
   selector: 'app-agregar-envio',
-  imports: [FormsModule,CommonModule],
+  imports: [FormsModule, CommonModule, DecimalPipe],
   templateUrl: './agregar-envio.html',
   styleUrl: './agregar-envio.css',
 })
@@ -19,8 +21,10 @@ export class AgregarEnvio {
   private router              = inject(Router);
   private tipoProductoService = inject(TipoProductoService);
   private route               = inject(ActivatedRoute);
+  private sedeService         = inject(SedeService);
 
   tiposProducto = signal<TipoProductoDTO[]>([]);
+  sedes         = signal<SedeDTO[]>([]);
   guardando     = signal(false);
   cargando      = signal(false);
   errorGuardar  = signal<string | null>(null);
@@ -32,26 +36,30 @@ export class AgregarEnvio {
   EstadoPago  = EstadoPago;
 
   form = {
-    nombreRemitente:    '',
-    dniRemitente:       '',
-    nombreDestinatario: '',
-    dniDestinatario:    '',
-    provincia:          '',
-    horaSalida:         '',
-    horaLlegada:        '',
-    fechaEnvio:         '',
-    estadoEnvio:        EstadoEnvio.PORSALIR,
+    nombreRemitente:       '',
+    dniRemitente:          '',
+    nombreDestinatario:    '',
+    dniDestinatario:       '',
+    provincia:             '',
+    horaSalida:            '',
+    horaLlegada:           '',
+    fechaEnvio:            '',
+    estadoEnvio:           EstadoEnvio.PORSALIR,
+    nombrePersonaAutorizada: '',
+    dniPersonaAutorizada:    '',
     producto: {
       tipoProductoId:  0,
       descripcion:     '',
       numeroPaquetes:  1,
     },
     pago: {
-      monto:      0,      // ← existe para que TypeScript no se queje y para mostrarlo en el resumen
+      monto:      0,
       metodoPago: '',
       fechaPago:  '',
       estadoPago: EstadoPago.PAGADO,
-    }
+    },
+    sedeOrigenId:  null as number | null,
+    sedeDestinoId: null as number | null,
   };
 
   provincias = [
@@ -62,6 +70,7 @@ export class AgregarEnvio {
 
   ngOnInit(): void {
     this.cargarTiposProducto();
+    this.cargarSedes();
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -71,10 +80,20 @@ export class AgregarEnvio {
     }
   }
 
+  cargarSedes(): void {
+    this.sedeService.listarActivas().subscribe({
+      next: (sedes) => {
+        console.log('Sedes cargadas:', sedes);
+        this.sedes.set(sedes);
+      },
+      error: () => console.error('Error al cargar sedes')
+    });
+  }
+
   cargarTiposProducto(): void {
-    this.tipoProductoService.listarPaginado(0, 50, true).subscribe({
+    this.tipoProductoService.listarPaginado(0, 50).subscribe({
       next: (res) => {
-        console.log('Tipos activos recibidos:', res.content); 
+        console.log('Tipos de producto:', res.content);
         this.tiposProducto.set(res.content);
       },
       error: () => console.error('Error al cargar tipos de producto')
@@ -86,26 +105,30 @@ export class AgregarEnvio {
     this.enviosService.getEnvioById(id).subscribe({
       next: (envio) => {
         this.form = {
-          nombreRemitente:    envio.nombreRemitente,
-          dniRemitente:       envio.dniRemitente,
-          nombreDestinatario: envio.nombreDestinatario,
-          dniDestinatario:    envio.dniDestinatario,
-          provincia:          envio.provincia,
-          horaSalida:         envio.horaSalida,
-          horaLlegada:        envio.horaLlegada,
-          fechaEnvio:         envio.fechaEnvio?.slice(0, 16),
-          estadoEnvio:        envio.estadoEnvio,
+          nombreRemitente:         envio.nombreRemitente,
+          dniRemitente:            envio.dniRemitente,
+          nombreDestinatario:      envio.nombreDestinatario,
+          dniDestinatario:         envio.dniDestinatario,
+          provincia:               envio.provincia,
+          horaSalida:              envio.horaSalida,
+          horaLlegada:             envio.horaLlegada,
+          fechaEnvio:              envio.fechaEnvio?.slice(0, 16) ?? '',
+          estadoEnvio:             envio.estadoEnvio,
+          nombrePersonaAutorizada: envio.nombrePersonaAutorizada ?? '',
+          dniPersonaAutorizada:    envio.dniPersonaAutorizada ?? '',
           producto: {
-            tipoProductoId:  envio.producto.tipoProductoId,
-            descripcion:     envio.producto.descripcion,
-            numeroPaquetes:  envio.producto.numeroPaquetes,
+            tipoProductoId:  envio.producto?.tipoProductoId ?? 0,
+            descripcion:     envio.producto?.descripcion ?? '',
+            numeroPaquetes:  envio.producto?.numeroPaquetes ?? 1,
           },
           pago: {
-            monto:      envio.pago.monto,   // ← viene del back al cargar
-            metodoPago: envio.pago.metodoPago,
-            fechaPago:  envio.pago.fechaPago?.slice(0, 16),
-            estadoPago: envio.pago.estadoPago,
-          }
+            monto:      envio.pago?.monto ?? 0,
+            metodoPago: envio.pago?.metodoPago ?? '',
+            fechaPago:  envio.pago?.fechaPago?.slice(0, 16) ?? '',
+            estadoPago: envio.pago?.estadoPago ?? EstadoPago.PAGADO,
+          },
+          sedeOrigenId:  envio.sedeId ?? null,
+          sedeDestinoId: envio.sedeDestinoId ?? null,
         };
         this.cargando.set(false);
       },
@@ -119,13 +142,43 @@ export class AgregarEnvio {
   guardar(): void {
     if (this.modoVer()) return;
 
+    // validaciones básicas
+    if (!this.form.sedeOrigenId) {
+      this.errorGuardar.set('Debes seleccionar la sede de origen.');
+      return;
+    }
+    if (!this.form.sedeDestinoId) {
+      this.errorGuardar.set('Debes seleccionar la sede destino.');
+      return;
+    }
+    if (!this.form.producto.tipoProductoId) {
+      this.errorGuardar.set('Debes seleccionar el tipo de producto.');
+      return;
+    }
+
     this.guardando.set(true);
     this.errorGuardar.set(null);
 
-    // monto NO se manda al back, lo calcula el servidor
     const dto = {
-      ...this.form,
-      fechaEnvio: new Date(this.form.fechaEnvio).toISOString(),
+      nombreRemitente:         this.form.nombreRemitente,
+      dniRemitente:            this.form.dniRemitente,
+      nombreDestinatario:      this.form.nombreDestinatario,
+      dniDestinatario:         this.form.dniDestinatario,
+      provincia:               this.form.provincia,
+      horaSalida:              this.form.horaSalida,
+      horaLlegada:             this.form.horaLlegada,
+      fechaEnvio:              new Date(this.form.fechaEnvio).toISOString(),
+      estadoEnvio:             this.form.estadoEnvio,
+      nombrePersonaAutorizada: this.form.nombrePersonaAutorizada || null,
+      dniPersonaAutorizada:    this.form.dniPersonaAutorizada || null,
+      sedeId:                  this.form.sedeOrigenId,      // sede que registra
+      sedeOrigenId:            this.form.sedeOrigenId,      // para validar ruta
+      sedeDestinoId:           this.form.sedeDestinoId,     // para validar ruta
+      producto: {
+        tipoProductoId: this.form.producto.tipoProductoId,
+        descripcion:    this.form.producto.descripcion,
+        numeroPaquetes: this.form.producto.numeroPaquetes,
+      },
       pago: {
         metodoPago: this.form.pago.metodoPago,
         fechaPago:  new Date(this.form.pago.fechaPago).toISOString(),
@@ -135,14 +188,15 @@ export class AgregarEnvio {
 
     this.enviosService.guardarEnvio(dto).subscribe({
       next: (envioGuardado) => {
-        // actualizar el monto con el valor calculado que devuelve el back
-        this.form.pago.monto = envioGuardado.pago.monto;
+        this.form.pago.monto = envioGuardado.pago?.monto ?? 0;
         this.exitoso.set(true);
         this.guardando.set(false);
         setTimeout(() => this.router.navigate(['/envios']), 1500);
       },
-      error: () => {
-        this.errorGuardar.set('Ocurrió un error al guardar el envío.');
+      error: (err) => {
+        this.errorGuardar.set(
+          err?.error?.message ?? 'Ocurrió un error al guardar el envío. Verifica que la ruta esté habilitada.'
+        );
         this.guardando.set(false);
       }
     });

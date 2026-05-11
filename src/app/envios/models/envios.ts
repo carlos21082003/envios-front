@@ -3,7 +3,7 @@ import { ProductosDTO } from "../../productos/models/productos";
 import { EstadoEnvio } from "./estado-envio";
 
 export interface Envios {
-     id?: number;
+  id?: number;
   horaSalida: string;
   horaLlegada: string;
   fechaEnvio: string;
@@ -15,5 +15,11 @@ export interface Envios {
   pago: PagosDTO;
   producto: ProductosDTO;
   provincia: string;
+  sedeId?: number;
+  sedeNombre?: string;
+  nombrePersonaAutorizada?: string;
+  dniPersonaAutorizada?: string;
+  sedeOrigenId?: number;
+  sedeDestinoId?: number;
 }
 

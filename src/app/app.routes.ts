@@ -28,8 +28,13 @@ export const routes: Routes = [
                   loadComponent: () =>
                     import('./envios/agregar-envio/agregar-envio').then(m => m.AgregarEnvio)
             },
+            {
+                path: 'rastreo',
+                loadComponent: () => 
+                    import('./envios/buscar-envio-cliente/buscar-envio-cliente').then(m => m.BuscarEnvioCliente)
+            },
 
-            //rutas de envios 
+            //rutas de pagos 
             {
                 path: 'pagos',
                 loadComponent: () => 
@@ -41,6 +46,39 @@ export const routes: Routes = [
                 path: 'productos',
                 loadComponent: () => 
                     import('./productos/productos').then(m=>m.Productos)
+            },
+
+            //rutas de usuarios
+            {
+                path: 'usuarios',
+                loadComponent: () => 
+                    import('./usuarios/usuarios').then(m=>m.Usuarios)
+            },
+
+            //rutas de sedes
+            {
+                path: 'sede',
+                loadComponent: () => 
+                    import('./sede/sede').then(m=>m.Sede)
+            },
+
+             //rutas de rutas
+            {
+                path: 'rutas',
+                loadComponent: () => 
+                    import('./rutas/rutas').then(m=>m.Rutas)
+            },
+
+             //rutas de solicitudes
+            {
+                path: 'solicitudes',
+                loadComponent: () => 
+                    import('./solicitud/solicitud').then(m=>m.Solicitud)
+            },
+            {
+              path: 'nueva-solicitud',
+              loadComponent: () =>
+                import('./solicitud/solicitud-usuario/solicitud-usuario').then(m => m.SolicitudUsuario)
             },
 
             //rutas de dashboard

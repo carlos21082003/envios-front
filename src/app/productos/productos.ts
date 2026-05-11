@@ -36,7 +36,7 @@ export class Productos {
   cargar(): void {
     this.cargando.set(true);
     const soloActivosFiltro = !this.mostrarTodos(); 
-  
+
     this.tipoProductoService.listarPaginado(this.paginaActual(), this.cantidad, soloActivosFiltro)
       .subscribe({
         next: (res) => {
@@ -48,7 +48,7 @@ export class Productos {
         error: () => this.cargando.set(false)
       });
   }
-  
+
   toggleMostrarTodos(): void {
     this.mostrarTodos.update(v => !v);
     this.paginaActual.set(0); 
@@ -56,7 +56,6 @@ export class Productos {
   }
 
   abrirEditar(tipo: TipoProductoDTO): void {
-    console.log('Editando tipo:', tipo);
     this.tipoSeleccionado.set(tipo);
     this.modalEditar.set(true);
   }

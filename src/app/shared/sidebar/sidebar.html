@@ -3,7 +3,7 @@
   <!-- BOTÓN FLOTANTE MÓVIL -->
   <button 
     (click)="toggleMenu()"
-    class="lg:hidden fixed top-4 left-4 z-60 w-10 h-10 bg-black text-white rounded-xl shadow-lg flex items-center justify-center border-2 border-white active:scale-90 transition-transform">
+    class="lg:hidden fixed top-4 left-4 z-70 w-10 h-10 bg-black text-white rounded-xl shadow-lg flex items-center justify-center border-2 border-white active:scale-90 transition-transform">
     <i class="fa-solid" [ngClass]="isMobileMenuOpen ? 'fa-xmark' : 'fa-bars-staggered'"></i>
   </button>
 
@@ -33,48 +33,83 @@
     </div>
 
     <!-- NAVEGACIÓN -->
-    <nav class="flex-1 px-4 py-2 overflow-y-auto flex flex-col gap-1.5">
-      <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] px-4 pt-4 pb-2">Principal</span>
-
-      <!-- Link Dashboard -->
+    <nav class="flex-1 px-4 py-2 overflow-y-auto flex flex-col gap-1">
+      
+      <!-- SECCIÓN 1: MONITOREO -->
+      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 pt-4 pb-2">Resumen</span>
+      
       <a routerLink="/dashboard" 
          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2" 
          [routerLinkActiveOptions]="{exact: true}"
-         class="group relative flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold no-underline transition-all duration-300 hover:bg-slate-50 hover:text-black border border-transparent active:scale-95">
-        <i class="fa-solid fa-chart-pie w-5 text-center opacity-70 group-hover:opacity-100 transition-opacity"></i>
+         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+        <i class="fa-solid fa-chart-pie w-5 text-center opacity-70 group-hover:opacity-100"></i>
         <span>Dashboard</span>
       </a>
 
-      <!-- Link Envíos -->
+      <a routerLink="/rastreo" 
+         routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+        <i class="fa-solid fa-magnifying-glass w-5 text-center opacity-70 group-hover:opacity-100"></i>
+        <span>Rastreo en vivo</span>
+      </a>
+
+      <a routerLink="/nueva-solicitud" 
+         routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+        <i class="fa-solid fa-circle-plus w-5 text-center opacity-70 group-hover:opacity-100"></i>
+        <span>Solicitar</span>
+      </a>
+
+      <!-- SECCIÓN 2: LOGÍSTICA -->
+      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 pt-6 pb-2">Operaciones</span>
+
       <a routerLink="/envios" 
          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
-         class="group relative flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold no-underline transition-all duration-300 hover:bg-slate-50 hover:text-black border border-transparent active:scale-95">
-        <i class="fa-solid fa-box-archive w-5 text-center opacity-70 group-hover:opacity-100 transition-opacity"></i>
-        <span>Envíos</span>
+         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+        <i class="fa-solid fa-box-archive w-5 text-center opacity-70 group-hover:opacity-100"></i>
+        <span>Gestión de Envíos</span>
       </a>
 
-      <!-- Link pagos -->
+      <a routerLink="/solicitudes" 
+         routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+        <i class="fa-solid fa-file-invoice w-5 text-center opacity-70 group-hover:opacity-100"></i>
+        <span>Solicitudes</span>
+      </a>
+
+      <a routerLink="/rutas" 
+         routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+        <i class="fa-solid fa-route w-5 text-center opacity-70 group-hover:opacity-100"></i>
+        <span>Rutas de Entrega</span>
+      </a>
+
       <a routerLink="/pagos" 
          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
-         class="group relative flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold no-underline transition-all duration-300 hover:bg-slate-50 hover:text-black border border-transparent active:scale-95">
-        <i class="fa-solid fa-money-bill w-5 text-center opacity-70 group-hover:opacity-100 transition-opacity"></i>
-        <span>Pagos</span>
+         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+        <i class="fa-solid fa-money-bill-transfer w-5 text-center opacity-70 group-hover:opacity-100"></i>
+        <span>Gestion de Pagos</span>
       </a>
 
-      <!-- Link productos -->
       <a routerLink="/productos" 
          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
-         class="group relative flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold no-underline transition-all duration-300 hover:bg-slate-50 hover:text-black border border-transparent active:scale-95">
-        <i class="fa-solid fa-box w-5 text-center opacity-70 group-hover:opacity-100 transition-opacity"></i>
-        <span>Productos</span>
+         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+        <i class="fa-solid fa-boxes-stacked w-5 text-center opacity-70 group-hover:opacity-100"></i>
+        <span>Gestion de Productos</span>
       </a>
 
-      <!-- Link usuarios -->
+      <a routerLink="/sede" 
+         routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+        <i class="fa-solid fa-map-location-dot w-5 text-center opacity-70 group-hover:opacity-100"></i>
+        <span>Gestion de Sedes</span>
+      </a>
+
       <a routerLink="/usuarios" 
          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
-         class="group relative flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold no-underline transition-all duration-300 hover:bg-slate-50 hover:text-black border border-transparent active:scale-95">
-        <i class="fa-solid fa-user w-5 text-center opacity-70 group-hover:opacity-100 transition-opacity"></i>
-        <span>Usuarios</span>
+         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+        <i class="fa-solid fa-user-gear w-5 text-center opacity-70 group-hover:opacity-100"></i>
+        <span>Gestion de Usuarios</span>
       </a>
 
     </nav>
@@ -82,7 +117,7 @@
     <!-- FOOTER USUARIO -->
     <div class="p-4 border-t border-slate-100">
       <div class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100 cursor-pointer hover:bg-white hover:shadow-sm transition-all duration-200 group">
-        <div class="w-9 h-9 rounded-xl bg-black flex items-center justify-center text-[11px] font-black text-white shrink-0 shadow-sm uppercase tracking-tighter group-hover:scale-110 transition-transform">
+        <div class="w-9 h-9 rounded-xl bg-black flex items-center justify-center text-[11px] font-black text-white shrink-0 shadow-sm uppercase group-hover:scale-105 transition-transform">
           AD
         </div>
         <div class="overflow-hidden">

@@ -12,38 +12,38 @@ import { TipoProductoDTO } from '../../../productos/models/tipo-producto';
   styleUrl: './modal-editar-productos.css',
 })
 export class ModalEditarProductos implements OnInit {
-  private productosService = inject(ProductosService);
+  private productosService    = inject(ProductosService);
   private tipoProductoService = inject(TipoProductoService);
 
   productoId  = input.required<number>();
   cerrar      = output<void>();
   actualizado = output<void>();
 
+  tiposProducto = signal<TipoProductoDTO[]>([]);
   guardando     = signal(false);
   cargando      = signal(true);
   error         = signal<string | null>(null);
-  tiposProducto = signal<TipoProductoDTO[]>([]);
 
   form = {
-    tipoProductoId:  0,
-    descripcion:     '',
-    numeroPaquetes:  1,
+    tipoProductoId: 0,
+    descripcion:    '',
+    numeroPaquetes: 1,
   };
 
-   ngOnInit(): void {
-    this.tipoProductoService.listarPaginado(0, 50).subscribe({
-      next: (res) => {
-        this.tiposProducto.set(res.content || res); 
-      },
-      error: () => console.error('Error al cargar tipos')
+  ngOnInit(): void {
+    // carga tipos activos para el select
+    this.tipoProductoService.listarPaginado(0, 50, true).subscribe({
+      next: (res) => this.tiposProducto.set(res.content),
+      error: () => console.error('Error al cargar tipos de producto')
     });
 
+    // carga el producto actual
     this.productosService.getProductoById(this.productoId()).subscribe({
       next: (producto) => {
         this.form = {
-          tipoProductoId:  producto.tipoProductoId,
-          descripcion:     producto.descripcion,
-          numeroPaquetes:  producto.numeroPaquetes,
+          tipoProductoId: producto.tipoProductoId,
+          descripcion:    producto.descripcion,
+          numeroPaquetes: producto.numeroPaquetes,
         };
         this.cargando.set(false);
       },

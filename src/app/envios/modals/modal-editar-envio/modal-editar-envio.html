@@ -64,6 +64,25 @@
         </select>
       </div>
 
+      <!-- Persona autorizada -->
+      <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wide mb-3">
+        <i class="fa fa-id-card mr-1"></i> Persona autorizada <span class="normal-case font-normal">(opcional)</span>
+      </p>
+      <div class="grid grid-cols-2 gap-3 mb-5">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Nombre</label>
+          <input [(ngModel)]="form.nombrePersonaAutorizada" type="text"
+            placeholder="Ej: Carlos Pérez"
+            class="px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all"/>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">DNI</label>
+          <input [(ngModel)]="form.dniPersonaAutorizada" type="text" maxlength="8"
+            placeholder="45678901"
+            class="px-3 py-2 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all"/>
+        </div>
+      </div>
+
       <!-- Horario y estado -->
       <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wide mb-3">
         <i class="fa fa-clock mr-1"></i> Horario y Estado

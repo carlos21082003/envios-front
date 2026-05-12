@@ -1,130 +1,174 @@
 <div class="flex min-h-screen bg-[#F8FAFC]">
-  
+
   <!-- BOTÓN FLOTANTE MÓVIL -->
-  <button 
+  <button
     (click)="toggleMenu()"
     class="lg:hidden fixed top-4 left-4 z-70 w-10 h-10 bg-black text-white rounded-xl shadow-lg flex items-center justify-center border-2 border-white active:scale-90 transition-transform">
     <i class="fa-solid" [ngClass]="isMobileMenuOpen ? 'fa-xmark' : 'fa-bars-staggered'"></i>
   </button>
 
   <!-- OVERLAY MÓVIL -->
-  <div 
-    *ngIf="isMobileMenuOpen"
-    (click)="toggleMenu()"
-    class="lg:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40 animate-in fade-in duration-300">
-  </div>
+  @if (isMobileMenuOpen) {
+    <div
+      (click)="toggleMenu()"
+      class="lg:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40">
+    </div>
+  }
 
   <!-- SIDEBAR -->
-  <aside 
+  <aside
     [ngClass]="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
     class="fixed lg:sticky top-0 left-0 w-64 h-screen bg-white border-r border-slate-200 flex flex-col z-50 shadow-sm transition-transform duration-300 ease-in-out">
 
-    <!-- BRAND / LOGO -->
+    <!-- BRAND -->
     <div class="px-6 py-8 flex items-center justify-between">
-      <div class="flex items-center gap-3 group">
+      <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-black flex items-center justify-center shrink-0 shadow-lg shadow-slate-200">
           <i class="fa-solid fa-truck-fast text-white text-sm"></i>
         </div>
         <div>
-          <div class="font-black text-lg text-black leading-tight tracking-tighter uppercase italic">Envíos<span class="text-slate-400">CAJ</span></div>
-          <div class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-0.5">Logística Profesional</div>
+          <div class="font-black text-lg text-black leading-tight tracking-tighter uppercase italic">
+            Envíos<span class="text-slate-400">CAJ</span>
+          </div>
+          <div class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-0.5">
+            Logística Profesional
+          </div>
         </div>
       </div>
     </div>
 
     <!-- NAVEGACIÓN -->
     <nav class="flex-1 px-4 py-2 overflow-y-auto flex flex-col gap-1">
-      
-      <!-- SECCIÓN 1: MONITOREO -->
-      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 pt-4 pb-2">Resumen</span>
-      
-      <a routerLink="/dashboard" 
-         routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2" 
-         [routerLinkActiveOptions]="{exact: true}"
-         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
-        <i class="fa-solid fa-chart-pie w-5 text-center opacity-70 group-hover:opacity-100"></i>
-        <span>Dashboard</span>
-      </a>
 
-      <a routerLink="/rastreo" 
-         routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
-         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
-        <i class="fa-solid fa-magnifying-glass w-5 text-center opacity-70 group-hover:opacity-100"></i>
-        <span>Rastreo en vivo</span>
-      </a>
+      <!-- RESUMEN -->
+      @if (hasRole('CLIENTE')) { 
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 pt-4 pb-2">
+          Resumen
+        </span>
+      }
 
-      <a routerLink="/nueva-solicitud" 
-         routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
-         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
-        <i class="fa-solid fa-circle-plus w-5 text-center opacity-70 group-hover:opacity-100"></i>
-        <span>Solicitar</span>
-      </a>
+      @if (hasRole('ADMIN', 'SUPER_ADMIN')) {
+        <a routerLink="/dashboard"
+          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+          [routerLinkActiveOptions]="{exact: true}"
+          class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+          <i class="fa-solid fa-chart-pie w-5 text-center opacity-70 group-hover:opacity-100"></i>
+          <span>Dashboard</span>
+        </a>
+      }
 
-      <!-- SECCIÓN 2: LOGÍSTICA -->
-      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 pt-6 pb-2">Operaciones</span>
+      @if (hasRole('CLIENTE')) {
+        <a routerLink="/rastreo"
+          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+          class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+          <i class="fa-solid fa-magnifying-glass w-5 text-center opacity-70 group-hover:opacity-100"></i>
+          <span>Rastreo en vivo</span>
+        </a>
+      }
 
-      <a routerLink="/envios" 
-         routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
-         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
-        <i class="fa-solid fa-box-archive w-5 text-center opacity-70 group-hover:opacity-100"></i>
-        <span>Gestión de Envíos</span>
-      </a>
+      @if (hasRole('CLIENTE')) {
+        <a routerLink="/nueva-solicitud"
+          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+          class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+          <i class="fa-solid fa-circle-plus w-5 text-center opacity-70 group-hover:opacity-100"></i>
+          <span>Solicitar</span>
+        </a>
+      }
 
-      <a routerLink="/solicitudes" 
-         routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
-         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
-        <i class="fa-solid fa-file-invoice w-5 text-center opacity-70 group-hover:opacity-100"></i>
-        <span>Solicitudes</span>
-      </a>
+      <!-- OPERACIONES -->
+      @if (hasRole('ADMIN', 'SUPER_ADMIN','EMPLEADO')) {
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 pt-6 pb-2">
+          Operaciones
+        </span>
+      }
 
-      <a routerLink="/rutas" 
-         routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
-         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
-        <i class="fa-solid fa-route w-5 text-center opacity-70 group-hover:opacity-100"></i>
-        <span>Rutas de Entrega</span>
-      </a>
+      @if (hasRole('ADMIN', 'SUPER_ADMIN','EMPLEADO')) {
+        <a routerLink="/envios"
+          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+          class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+          <i class="fa-solid fa-box-archive w-5 text-center opacity-70 group-hover:opacity-100"></i>
+          <span>Gestión de Envíos</span>
+        </a>
+      }
 
-      <a routerLink="/pagos" 
-         routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
-         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
-        <i class="fa-solid fa-money-bill-transfer w-5 text-center opacity-70 group-hover:opacity-100"></i>
-        <span>Gestion de Pagos</span>
-      </a>
+      @if (hasRole('ADMIN', 'SUPER_ADMIN','EMPLEADO')) {
+        <a routerLink="/solicitudes"
+          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+          class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+          <i class="fa-solid fa-file-invoice w-5 text-center opacity-70 group-hover:opacity-100"></i>
+          <span>Solicitudes</span>
+        </a>
+      }
 
-      <a routerLink="/productos" 
-         routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
-         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
-        <i class="fa-solid fa-boxes-stacked w-5 text-center opacity-70 group-hover:opacity-100"></i>
-        <span>Gestion de Productos</span>
-      </a>
+      @if (hasRole('ADMIN', 'SUPER_ADMIN')) {
+        <a routerLink="/rutas"
+          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+          class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+          <i class="fa-solid fa-route w-5 text-center opacity-70 group-hover:opacity-100"></i>
+          <span>Rutas de Entrega</span>
+        </a>
+      }
 
-      <a routerLink="/sede" 
-         routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
-         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
-        <i class="fa-solid fa-map-location-dot w-5 text-center opacity-70 group-hover:opacity-100"></i>
-        <span>Gestion de Sedes</span>
-      </a>
+      @if (hasRole('ADMIN', 'SUPER_ADMIN','EMPLEADO')) {
+        <a routerLink="/pagos"
+          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+          class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+          <i class="fa-solid fa-money-bill-transfer w-5 text-center opacity-70 group-hover:opacity-100"></i>
+          <span>Gestión de Pagos</span>
+        </a>
+      }
 
-      <a routerLink="/usuarios" 
-         routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
-         class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
-        <i class="fa-solid fa-user-gear w-5 text-center opacity-70 group-hover:opacity-100"></i>
-        <span>Gestion de Usuarios</span>
-      </a>
+      @if (hasRole('ADMIN', 'SUPER_ADMIN')) {
+        <a routerLink="/productos"
+          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+          class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+          <i class="fa-solid fa-boxes-stacked w-5 text-center opacity-70 group-hover:opacity-100"></i>
+          <span>Gestión de Productos</span>
+        </a>
+
+        <a routerLink="/sede"
+           routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+           class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+          <i class="fa-solid fa-map-location-dot w-5 text-center opacity-70 group-hover:opacity-100"></i>
+          <span>Gestión de Sedes</span>
+        </a>
+
+        <a routerLink="/usuarios"
+           routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+           class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+          <i class="fa-solid fa-user-gear w-5 text-center opacity-70 group-hover:opacity-100"></i>
+          <span>Gestión de Usuarios</span>
+        </a>
+      }
 
     </nav>
 
     <!-- FOOTER USUARIO -->
     <div class="p-4 border-t border-slate-100">
-      <div class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100 cursor-pointer hover:bg-white hover:shadow-sm transition-all duration-200 group">
-        <div class="w-9 h-9 rounded-xl bg-black flex items-center justify-center text-[11px] font-black text-white shrink-0 shadow-sm uppercase group-hover:scale-105 transition-transform">
-          AD
+
+      <!-- INFO USUARIO -->
+      <div class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100 mb-2">
+        <div class="w-9 h-9 rounded-xl bg-black flex items-center justify-center text-[11px] font-black text-white shrink-0 shadow-sm uppercase">
+          {{ iniciales }}
         </div>
-        <div class="overflow-hidden">
-          <div class="text-[12px] font-black text-black leading-tight truncate uppercase italic">Administrador</div>
-          <div class="text-[10px] text-slate-400 font-bold truncate tracking-tight uppercase">Cajamarca</div>
+        <div class="overflow-hidden flex-1">
+          <div class="text-[12px] font-black text-black leading-tight truncate uppercase italic">
+            {{ usuario?.nombre ?? 'Usuario' }}
+          </div>
+          <div class="text-[10px] text-slate-400 font-bold truncate tracking-tight uppercase">
+            {{ usuario?.sedeNombre ?? usuario?.rol }}
+          </div>
         </div>
       </div>
+
+      <!-- CERRAR SESIÓN -->
+      <button
+        (click)="logout()"
+        class="cursor-pointer w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-500 text-[13px] font-semibold hover:bg-red-50 hover:text-red-600 transition-all duration-200">
+        <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i>
+        <span>Cerrar sesión</span>
+      </button>
+
     </div>
   </aside>
 
@@ -134,4 +178,5 @@
       <router-outlet></router-outlet>
     </div>
   </main>
+
 </div>

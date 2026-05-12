@@ -83,23 +83,23 @@
 
                 <td class="px-5 py-4 text-slate-500 hidden lg:table-cell">{{ sede.telefono }}</td>
 
-                <td class="px-5 py-4 hidden lg:table-cell">
-                  <div class="flex items-center justify-center gap-1.5">
-                    @if (sede.tieneRecojo) {
-                      <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg border border-blue-100">
-                        <i class="fa fa-box mr-1"></i>Recojo
-                      </span>
-                    }
-                    @if (sede.tieneDelivery) {
-                      <span class="px-2 py-0.5 bg-amber-50 text-amber-700 text-xs font-bold rounded-lg border border-amber-100">
-                        <i class="fa fa-motorcycle mr-1"></i>Delivery
-                      </span>
-                    }
-                    @if (!sede.tieneRecojo && !sede.tieneDelivery) {
-                      <span class="text-slate-400 text-xs">—</span>
-                    }
-                  </div>
-                </td>
+                <td class="px-4 py-6 hidden lg:table-cell">
+  <div class="flex items-center justify-center gap-2">
+    @if (sede.tieneRecojo) {
+      <span class="px-3 py-1 bg-black text-white text-[10px] font-black uppercase tracking-tighter flex items-center gap-1.5">
+        <i class="fa fa-box-open"></i> Recojo
+      </span>
+    }
+    @if (sede.tieneDelivery) {
+      <span class="px-3 py-1 border-2 border-black text-black text-[10px] font-black uppercase tracking-tighter flex items-center gap-1.5">
+        <i class="fa fa-moped"></i> Delivery
+      </span>
+    }
+    @if (!sede.tieneRecojo && !sede.tieneDelivery) {
+      <span class="text-zinc-300 font-black">—</span>
+    }
+  </div>
+</td>
 
                 <td class="px-5 py-4 text-center">
                   @if (sede.activo) {

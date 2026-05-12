@@ -10,9 +10,8 @@
       <p class="text-slate-500 text-sm mt-2">Solicita recojo o delivery de tu paquete</p>
     </div>
 
-    <!-- ══════════════════════════════════ -->
-    <!-- PASO INICIO                       -->
-    <!-- ══════════════════════════════════ -->
+    <!-- PASO INICIO -->
+
     @if (paso() === 'inicio') {
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
@@ -37,8 +36,8 @@
         <button
           (click)="mostrarModalDelivery.set(true)"
           class="cursor-pointer group bg-white rounded-2xl border-2 border-slate-200 hover:border-black p-6 text-left transition-all hover:shadow-md">
-          <div class="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center mb-4 group-hover:bg-black transition-all">
-            <i class="fa fa-motorcycle text-white text-lg"></i>
+          <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-black transition-all">
+            <i class="fa fa-motorcycle text-slate-600 text-lg group-hover:text-white transition-all"></i>
           </div>
           <h3 class="text-base font-extrabold text-black mb-1">Delivery</h3>
           <p class="text-xs text-slate-500 leading-relaxed">

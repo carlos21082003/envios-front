@@ -34,13 +34,6 @@
           class="cursor-pointer bg-black text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-800 transition-all">
           Buscar
         </button>
-        <select class="cursor-pointer bg-white border border-slate-200 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-600 outline-none focus:border-black">
-          <option>Todos</option>
-          <option>Por salir</option>
-          <option>En tránsito</option>
-          <option>Entregado</option>
-          <option>Salió</option>
-        </select>
       </div>
     </div>
 
@@ -74,6 +67,7 @@
                 <td class="px-6 py-4">
                   <p class="text-sm font-medium text-black">{{ envio.nombreRemitente }}</p>
                   <p class="text-xs text-slate-400 mt-0.5">DNI {{ envio.dniRemitente }}</p>
+                  <p class="text-xs text-slate-300 mt-0.5 font-mono tracking-widest"># {{ envio.codigoEnvio }}</p>
                 </td>
 
                 <td class="px-6 py-4">
@@ -97,23 +91,28 @@
                 </td>
 
                 <td class="px-6 py-4">
-                  <div class="flex items-center justify-end gap-1.5">
+                  <div class="flex items-center justify-end gap-1.5 flex-wrap">
+
                     <button (click)="verEnvio(envio.id)" title="Ver envío"
                       class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
                       <i class="fa-solid fa-eye text-[10px]"></i> Ver
                     </button>
+
                     <button (click)="abrirModalEnvio(envio)" title="Editar envío"
                       class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
                       <i class="fa-solid fa-edit text-[10px]"></i> Editar
                     </button>
+
                     <button (click)="abrirModalPago(envio)" title="Editar pago"
                       class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
                       <i class="fa-solid fa-credit-card text-[10px]"></i> Pago
                     </button>
-                    <button (click)="abrirModalProducto(envio)" title="Editar producto"
+
+                    <button (click)="abrirModalProducto(envio)" title="Editar productos"
                       class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-[11px] font-bold hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-all">
-                      <i class="fa-solid fa-box text-[10px]"></i> Producto
+                      <i class="fa-solid fa-box text-[10px]"></i> Productos
                     </button>
+
                   </div>
                 </td>
 
@@ -179,9 +178,10 @@
   }
 
   @if (modalProducto() && envioSeleccionado()) {
-    <app-modal-editar-productos
-      [productoId]="envioSeleccionado().producto.id"
-      (cerrar)="modalProducto.set(false)"
-      (actualizado)="onActualizado()"/>
+  <app-modal-editar-productos
+    [productos]="envioSeleccionado().productos"
+    (cerrar)="modalProducto.set(false)"
+    (actualizado)="onActualizado()"/>
   }
+
 </div>

@@ -1,7 +1,7 @@
 export interface ProductosDTO {
   id?: number;
-  tipoProductoId: number;       // antes era tipoProducto: string
-  tipoProductoNombre?: string;  // solo viene en responses
+  tipoProductoId: number;      
+  tipoProductoNombre?: string;  
   descripcion: string;
   numeroPaquetes: number;
   precioPorProducto?: number;

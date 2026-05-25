@@ -1,13 +1,14 @@
 <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
      (click)="cerrar.emit()">
 
-  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6"
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6"
        (click)="$event.stopPropagation()">
 
+    <!-- Header -->
     <div class="flex items-center justify-between mb-5">
       <div>
-        <h3 class="text-base font-extrabold text-black">Editar producto</h3>
-        <p class="text-xs text-slate-400 mt-0.5">Actualiza los datos del producto</p>
+        <h3 class="text-base font-extrabold text-black">Editar productos</h3>
+        <p class="text-xs text-slate-400 mt-0.5">{{ forms().length }} producto(s) en este envío</p>
       </div>
       <button (click)="cerrar.emit()"
         class="w-8 h-8 flex items-center cursor-pointer justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-black hover:bg-slate-50 transition-all">
@@ -15,38 +16,53 @@
       </button>
     </div>
 
-    @if (cargando()) {
-      <div class="py-8 text-center text-slate-400 text-sm">
-        <i class="fa fa-spinner fa-spin mr-2"></i> Cargando datos...
-      </div>
-    } @else {
-      <div class="flex flex-col gap-4 mb-5">
+    <!-- Lista de productos -->
+    <div class="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-1 mb-4">
+      @for (form of forms(); track form.id) {
+        <div class="p-4 border border-slate-100 rounded-xl bg-slate-50 flex flex-col gap-3">
 
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Tipo de producto</label>
-          <select [(ngModel)]="form.tipoProductoId"
-            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white">
-            <option [value]="0">Seleccionar...</option>
-            @for (tipo of tiposProducto(); track tipo.id) {
-              <option [value]="tipo.id">{{ tipo.nombre }}</option>
-            }
-          </select>
+          <span class="text-xs font-bold text-slate-500 uppercase">Producto {{ $index + 1 }}</span>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Tipo</label>
+            <select [(ngModel)]="form.tipoProductoId"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all bg-white">
+              <option [ngValue]="0">Seleccionar...</option>
+              @for (tipo of tiposProducto(); track tipo.id) {
+                <option [ngValue]="tipo.id">{{ tipo.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="flex gap-3">
+            <div class="flex flex-col gap-1.5 flex-1">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">N° paquetes</label>
+              <input [(ngModel)]="form.numeroPaquetes" type="number" min="1"
+                class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all"/>
+            </div>
+            <div class="flex flex-col gap-1.5 flex-1">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Subtotal</label>
+              <div class="px-4 py-2.5 border border-slate-100 rounded-xl text-sm bg-white text-slate-600 font-bold">
+                S/. {{ subtotal(form) | number:'1.2-2' }}
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Descripción</label>
+            <textarea [(ngModel)]="form.descripcion" rows="2"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all resize-none"></textarea>
+          </div>
+
         </div>
+      }
+    </div>
 
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">N° de paquetes</label>
-          <input [(ngModel)]="form.numeroPaquetes" type="number" min="1"
-            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
-        </div>
-
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Descripción</label>
-          <textarea [(ngModel)]="form.descripcion" rows="3"
-            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all resize-none"></textarea>
-        </div>
-
-      </div>
-    }
+    <!-- Total -->
+    <div class="flex justify-between items-center px-1 mb-4">
+      <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Total estimado</span>
+      <span class="text-base font-extrabold text-black">S/. {{ totalEstimado | number:'1.2-2' }}</span>
+    </div>
 
     @if (error()) {
       <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 flex items-center gap-2">
@@ -54,17 +70,18 @@
       </div>
     }
 
+    <!-- Botones -->
     <div class="flex gap-2">
       <button (click)="cerrar.emit()"
         class="flex-1 py-2.5 cursor-pointer border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">
         Cancelar
       </button>
-      <button (click)="guardar()" [disabled]="guardando() || cargando()"
+      <button (click)="guardar()" [disabled]="guardando()"
         class="flex-1 py-2.5 cursor-pointer bg-black text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
         @if (guardando()) {
           <i class="fa fa-spinner fa-spin"></i> Guardando...
         } @else {
-          Actualizar
+          Actualizar todo
         }
       </button>
     </div>

@@ -11,9 +11,10 @@ import { EstadoEnvio } from '../models/estado-envio';
   styleUrl: './buscar-envio-cliente.css',
 })
 export class BuscarEnvioCliente {
- private enviosService = inject(EnviosService);
+  private enviosService = inject(EnviosService);
 
   dni      = '';
+  envios   = signal<any[]>([]);
   envio    = signal<any | null>(null);
   cargando = signal(false);
   error    = signal<string | null>(null);
@@ -27,10 +28,12 @@ export class BuscarEnvioCliente {
     this.cargando.set(true);
     this.error.set(null);
     this.envio.set(null);
+    this.envios.set([]);
 
     this.enviosService.rastrearEnvio(dniLimpio).subscribe({
       next: (res) => {
-        this.envio.set(res);
+        this.envios.set(res);
+        this.envio.set(res[0]);
         this.cargando.set(false);
       },
       error: () => {
@@ -40,9 +43,14 @@ export class BuscarEnvioCliente {
     });
   }
 
+  seleccionar(e: any): void {
+    this.envio.set(e);
+  }
+
   limpiar(): void {
     this.dni = '';
     this.envio.set(null);
+    this.envios.set([]);
     this.error.set(null);
   }
 

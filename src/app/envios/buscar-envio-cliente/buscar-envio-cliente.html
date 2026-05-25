@@ -6,7 +6,7 @@
       <i class="fa-solid fa-box-open text-2xl"></i>
     </div>
     <h1 class="text-3xl font-extrabold text-black tracking-tight">Rastrea tu Envío</h1>
-    <p class="text-slate-500 mt-2 text-sm">Ingresa tu DNI para conocer el estado actual de tu paquete.</p>
+    <p class="text-slate-500 mt-2 text-sm">Ingresa el DNI del remitente para conocer el estado actual de tu paquete.</p>
   </div>
 
   <!-- Buscador -->
@@ -17,11 +17,11 @@
         [(ngModel)]="dni"
         (keyup.enter)="buscar()"
         type="text"
-        placeholder="Tu número de DNI"
+        placeholder="DNI del remitente"
         maxlength="8"
         class="w-full pl-11 pr-4 py-3 bg-transparent outline-none text-sm font-medium"/>
     </div>
-    @if (envio()) {
+    @if (envios().length > 0) {
       <button (click)="limpiar()"
         class="cursor-pointer p-3 rounded-xl text-slate-400 hover:text-black hover:bg-slate-50 transition-all">
         <i class="fa-solid fa-xmark"></i>
@@ -46,6 +46,32 @@
     </div>
   }
 
+  <!-- Selector de envíos (solo si hay más de uno) -->
+  @if (envios().length > 1) {
+    <div class="w-full max-w-2xl mb-4 flex flex-col gap-2">
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-wide px-1">
+        {{ envios().length }} envíos encontrados — selecciona uno
+      </p>
+      @for (e of envios(); track e.id) {
+        <button
+          (click)="seleccionar(e)"
+          class="w-full text-left px-4 py-3 rounded-2xl border transition-all text-sm font-medium flex justify-between items-center"
+          [class]="envio()?.id === e.id
+            ? 'bg-black text-white border-black'
+            : 'bg-white text-slate-700 border-slate-200 hover:border-slate-400'">
+          <span>
+            <span class="font-mono font-bold">#{{ e.codigoEnvio }}</span>
+            <span class="ml-2 opacity-60">{{ e.fechaEnvio | date:'dd/MM/yyyy' }}</span>
+          </span>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border"
+            [class]="badgeClase(e.estadoEnvio)">
+            {{ badgeTexto(e.estadoEnvio) }}
+          </span>
+        </button>
+      }
+    </div>
+  }
+
   <!-- Resultado -->
   @if (envio(); as e) {
     <div class="w-full max-w-2xl bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
@@ -54,7 +80,7 @@
       <div class="bg-black p-6 text-white flex justify-between items-start">
         <div>
           <p class="text-[10px] uppercase tracking-widest font-bold opacity-60 mb-1">Código de envío</p>
-          <h3 class="text-xl font-mono font-bold">#{{ e.id }}</h3>
+          <h3 class="text-xl font-mono font-bold">#{{ e.codigoEnvio }}</h3>
           <p class="text-xs text-white/60 mt-1">{{ e.sedeNombre || 'Agencia Cajamarca' }}</p>
         </div>
         <span class="px-3 py-1.5 rounded-full text-xs font-bold border"

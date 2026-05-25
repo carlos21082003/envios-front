@@ -15,6 +15,16 @@
       <h2 class="text-2xl font-extrabold text-black">
         {{ modoVer() ? 'Detalle del Envío' : 'Registrar Envío' }}
       </h2>
+
+       <!-- Código de envío — solo en modo ver -->
+      @if (modoVer() && codigoEnvio()) {
+        <div class="inline-flex items-center gap-2 mt-1.5 px-3 py-1 bg-slate-100 rounded-lg">
+          <i class="fa fa-hashtag text-slate-400 text-xs"></i>
+          <span class="text-sm font-mono font-bold text-slate-700 tracking-widest">{{ codigoEnvio() }}</span>
+          <span class="text-xs text-slate-400">código de envío</span>
+        </div>
+      }
+
       <p class="text-slate-500 text-sm">
         {{ modoVer() ? 'Información completa del envío.' : 'Completa todos los datos del envío, producto y pago.' }}
       </p>
@@ -216,49 +226,78 @@
     <!-- COLUMNA DERECHA -->
     <div class="flex flex-col gap-6">
 
-      <!-- PRODUCTO -->
+      <!-- PRODUCTOS ← sección reemplazada -->
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
         <h3 class="text-sm font-extrabold text-black uppercase tracking-wide mb-4 flex items-center gap-2">
-          <i class="fa fa-box text-slate-400"></i> Producto
+          <i class="fa fa-box text-slate-400"></i> Productos
         </h3>
-        <div class="flex flex-col gap-4">
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Tipo de producto</label>
-            <select [(ngModel)]="form.producto.tipoProductoId" [disabled]="modoVer()"
-              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all bg-white disabled:bg-slate-50 disabled:cursor-not-allowed">
-              <option [ngValue]="0">Seleccionar...</option>
-              @for (tipo of tiposProducto(); track tipo.id) {
-                <option [ngValue]="tipo.id">{{ tipo.nombre }} — S/. {{ tipo.precioBase | number:'1.2-2' }}</option>
-              }
-            </select>
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">N° de paquetes</label>
-            <input [(ngModel)]="form.producto.numeroPaquetes" [disabled]="modoVer()"
-              type="number" min="1" placeholder="1"
-              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"/>
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Descripción</label>
-            <textarea [(ngModel)]="form.producto.descripcion" [disabled]="modoVer()" rows="3"
-              placeholder="Ej: Caja de cartón con ropa y zapatos..."
-              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all resize-none disabled:bg-slate-50 disabled:cursor-not-allowed"></textarea>
-          </div>
 
-          <!-- precio estimado -->
-          @if (form.producto.tipoProductoId && form.producto.numeroPaquetes && !modoVer()) {
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-              <p class="text-xs text-slate-500 font-medium">Precio estimado</p>
-              <p class="text-base font-bold text-black mt-0.5">
-                S/. {{
-                  ((tiposProducto().find(t => t.id === form.producto.tipoProductoId)?.precioBase ?? 0)
-                  * form.producto.numeroPaquetes) | number:'1.2-2'
-                }}
-              </p>
-              <p class="text-xs text-slate-400 mt-0.5">El precio final lo confirma el servidor al guardar</p>
+        @for (prod of form.productos; track $index) {
+          <div class="flex flex-col gap-3 mb-3 p-4 border border-slate-100 rounded-xl bg-slate-50">
+
+            <!-- Header del producto -->
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-slate-500 uppercase">
+                Producto {{ $index + 1 }}
+              </span>
+              @if (form.productos.length > 1 && !modoVer()) {
+                <button (click)="eliminarProducto($index)"
+                  class="cursor-pointer text-xs text-red-400 hover:text-red-600 transition-colors flex items-center gap-1">
+                  <i class="fa fa-trash"></i> Eliminar
+                </button>
+              }
             </div>
-          }
-        </div>
+
+            <!-- Tipo -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Tipo de producto</label>
+              <select [(ngModel)]="prod.tipoProductoId" [disabled]="modoVer()"
+                class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all bg-white disabled:bg-slate-50 disabled:cursor-not-allowed">
+                <option [ngValue]="0">Seleccionar...</option>
+                @for (tipo of tiposProducto(); track tipo.id) {
+                  <option [ngValue]="tipo.id">{{ tipo.nombre }} — S/. {{ tipo.precioBase | number:'1.2-2' }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Paquetes -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">N° de paquetes</label>
+              <input [(ngModel)]="prod.numeroPaquetes" [disabled]="modoVer()"
+                type="number" min="1"
+                class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"/>
+            </div>
+
+            <!-- Descripción -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Descripción</label>
+              <textarea [(ngModel)]="prod.descripcion" [disabled]="modoVer()" rows="2"
+                placeholder="Ej: Caja de cartón con ropa..."
+                class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all resize-none disabled:bg-slate-50 disabled:cursor-not-allowed"></textarea>
+            </div>
+
+            <!-- Subtotal por producto -->
+            @if (prod.tipoProductoId && prod.numeroPaquetes && !modoVer()) {
+              <div class="flex justify-between items-center text-xs text-slate-500 pt-2 border-t border-slate-200">
+                <span>Subtotal</span>
+                <span class="font-bold text-slate-700">
+                  S/. {{
+                    ((tiposProducto().find(t => t.id === prod.tipoProductoId)?.precioBase ?? 0)
+                    * prod.numeroPaquetes) | number:'1.2-2'
+                  }}
+                </span>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Botón agregar -->
+        @if (!modoVer()) {
+          <button (click)="agregarProducto()"
+            class="cursor-pointer w-full border border-dashed border-slate-300 text-slate-500 py-2.5 rounded-xl text-sm font-bold hover:border-black hover:text-black transition-all flex items-center justify-center gap-2 mt-1">
+            <i class="fa fa-plus"></i> Agregar producto
+          </button>
+        }
       </div>
 
       <!-- PAGO -->
@@ -326,33 +365,39 @@
               {{ sedes().find(s => s.id === form.sedeDestinoId)?.nombre || '—' }}
             </span>
           </div>
-          <div class="flex justify-between">
-            <span class="text-slate-400">Producto</span>
-            <span class="font-medium">
-              {{ tiposProducto().find(t => t.id === form.producto.tipoProductoId)?.nombre || '—' }}
-            </span>
+
+          <!-- Lista de productos en el resumen ← actualizado -->
+          <div class="border-t border-slate-700 my-1 pt-2 flex flex-col gap-1.5">
+            @for (prod of form.productos; track $index) {
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-400 truncate mr-2">
+                  {{ tiposProducto().find(t => t.id === prod.tipoProductoId)?.nombre || 'Sin tipo' }}
+                  × {{ prod.numeroPaquetes }}
+                </span>
+                <span class="text-slate-300 shrink-0">
+                  S/. {{
+                    ((tiposProducto().find(t => t.id === prod.tipoProductoId)?.precioBase ?? 0)
+                    * prod.numeroPaquetes) | number:'1.2-2'
+                  }}
+                </span>
+              </div>
+            }
           </div>
-          <div class="flex justify-between">
-            <span class="text-slate-400">Paquetes</span>
-            <span class="font-medium">{{ form.producto.numeroPaquetes }}</span>
-          </div>
+
           <div class="flex justify-between">
             <span class="text-slate-400">Método pago</span>
             <span class="font-medium">{{ form.pago.metodoPago || '—' }}</span>
           </div>
           <div class="border-t border-slate-700 my-2"></div>
+
+          <!-- Total ← usa totalEstimado -->
           <div class="flex justify-between text-base">
             <span class="text-slate-300 font-bold">Total estimado</span>
             <span class="font-extrabold text-white">
               @if (form.pago.monto) {
                 S/. {{ form.pago.monto | number:'1.2-2' }}
-              } @else if (form.producto.tipoProductoId) {
-                S/. {{
-                  ((tiposProducto().find(t => t.id === form.producto.tipoProductoId)?.precioBase ?? 0)
-                  * form.producto.numeroPaquetes) | number:'1.2-2'
-                }}
               } @else {
-                Se calcula al guardar
+                S/. {{ totalEstimado | number:'1.2-2' }}
               }
             </span>
           </div>

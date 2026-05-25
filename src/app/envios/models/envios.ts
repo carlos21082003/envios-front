@@ -4,6 +4,7 @@ import { EstadoEnvio } from "./estado-envio";
 
 export interface Envios {
   id?: number;
+  codigoEnvio?: string;
   horaSalida: string;
   horaLlegada: string;
   fechaEnvio: string;
@@ -13,13 +14,13 @@ export interface Envios {
   dniRemitente: string;
   estadoEnvio: EstadoEnvio;
   pago: PagosDTO;
-  producto: ProductosDTO;
+  productos: ProductosDTO[];
   provincia: string;
   sedeId?: number;
   sedeNombre?: string;
-  nombrePersonaAutorizada?: string;
-  dniPersonaAutorizada?: string;
-  sedeOrigenId?: number;
-  sedeDestinoId?: number;
+  nombrePersonaAutorizada?: string | null;  
+  dniPersonaAutorizada?: string | null;     
+  sedeOrigenId?: number | null;             
+  sedeDestinoId?: number | null; 
 }
 

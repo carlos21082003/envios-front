@@ -129,6 +129,7 @@
               <th class="text-left px-5 py-3 text-xs font-extrabold text-slate-500 uppercase tracking-wide">Tipo</th>
               <th class="text-left px-5 py-3 text-xs font-extrabold text-slate-500 uppercase tracking-wide">Solicitante</th>
               <th class="text-left px-5 py-3 text-xs font-extrabold text-slate-500 uppercase tracking-wide hidden md:table-cell">Dirección</th>
+              <th class="text-left px-5 py-3 text-xs font-extrabold text-slate-500 uppercase tracking-wide hidden md:table-cell">Descripción del producto </th>
               <th class="text-left px-5 py-3 text-xs font-extrabold text-slate-500 uppercase tracking-wide hidden lg:table-cell">Fecha</th>
               <th class="text-left px-5 py-3 text-xs font-extrabold text-slate-500 uppercase tracking-wide hidden lg:table-cell">Envío / Destino</th>
               <th class="text-center px-5 py-3 text-xs font-extrabold text-slate-500 uppercase tracking-wide">Estado</th>
@@ -156,6 +157,10 @@
                   @if (solicitud.referencia) {
                     <p class="text-slate-400 text-xs mt-0.5 truncate max-w-45">{{ solicitud.referencia }}</p>
                   }
+                </td>
+
+                <td class="px-5 py-4 hidden md:table-cell">
+                  <p class="text-slate-600 text-xs max-w-45 truncate">{{ solicitud.descripcionProducto  }}</p>
                 </td>
 
                 <td class="px-5 py-4 hidden lg:table-cell">
@@ -336,7 +341,7 @@
           <div>
             <h3 class="text-base font-extrabold text-black">Completar recojo y crear envío</h3>
             <p class="text-xs text-slate-500 mt-0.5">
-              Ingresa los datos del envío que se generará automáticamente.
+              Confirma los datos y completa la información del envío.
             </p>
           </div>
         </div>
@@ -349,14 +354,59 @@
       <!-- BODY -->
       <div class="p-6 flex flex-col gap-4">
 
-        <!-- INFO SOLICITUD -->
-        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-1">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Remitente (del recojo)</p>
+        <!-- INFO SOLICITUD — solo lectura -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-2">
+
+          <!-- REMITENTE -->
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Remitente</p>
           <p class="text-sm font-bold text-black">{{ solicitudACompletar()?.nombreSolicitante }}</p>
-          <p class="text-xs text-slate-500">DNI {{ solicitudACompletar()?.dniSolicitante }} · {{ solicitudACompletar()?.telefono }}</p>
+          <p class="text-xs text-slate-500">
+            DNI {{ solicitudACompletar()?.dniSolicitante }} · {{ solicitudACompletar()?.telefono }}
+          </p>
           <p class="text-xs text-slate-500 mt-0.5">
             <i class="fa fa-location-dot mr-1"></i>{{ solicitudACompletar()?.direccion }}
           </p>
+
+          <!-- DESTINATARIO — guardado al crear el recojo -->
+          @if (solicitudACompletar()?.nombreDestinatario) {
+            <div class="mt-2 pt-2 border-t border-slate-200">
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Destinatario</p>
+              <p class="text-xs text-slate-600">
+                {{ solicitudACompletar()?.nombreDestinatario }}
+                · DNI {{ solicitudACompletar()?.dniDestinatario }}
+              </p>
+              @if (solicitudACompletar()?.provinciaDestino) {
+                <p class="text-xs text-slate-500 mt-0.5">
+                  <i class="fa fa-map-pin mr-1"></i>{{ solicitudACompletar()?.provinciaDestino }}
+                </p>
+              }
+            </div>
+          }
+
+          <!-- PERSONA AUTORIZADA -->
+          @if (solicitudACompletar()?.nombrePersonaRecibe) {
+            <div class="mt-2 pt-2 border-t border-slate-200">
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">
+                Persona autorizada para recoger
+              </p>
+              <p class="text-xs text-slate-600">
+                {{ solicitudACompletar()?.nombrePersonaRecibe }}
+                · DNI {{ solicitudACompletar()?.dniPersonaRecibe }}
+              </p>
+            </div>
+          }
+
+          <!-- SEDE DESTINO -->
+          @if (solicitudACompletar()?.sedeDestinoNombre) {
+            <div class="mt-2 pt-2 border-t border-slate-200 flex items-center gap-2">
+              <i class="fa fa-building text-slate-400 text-xs"></i>
+              <p class="text-xs text-slate-600">
+                Sede destino:
+                <span class="font-bold text-black">{{ solicitudACompletar()?.sedeDestinoNombre }}</span>
+              </p>
+            </div>
+          }
+
         </div>
 
         @if (errorCompletar()) {
@@ -364,33 +414,6 @@
             <i class="fa fa-circle-exclamation text-red-400"></i> {{ errorCompletar() }}
           </div>
         }
-
-        <!-- DESTINATARIO -->
-        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wide">
-          <i class="fa fa-location-dot mr-1"></i> Destinatario
-        </p>
-        <div class="grid grid-cols-2 gap-3">
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Nombre <span class="text-red-400">*</span></label>
-            <input [(ngModel)]="completarForm.nombreDestinatario" type="text" placeholder="Nombre completo"
-              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">DNI <span class="text-red-400">*</span></label>
-            <input [(ngModel)]="completarForm.dniDestinatario" type="text" maxlength="8" placeholder="12345678"
-              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
-          </div>
-          <div class="flex flex-col gap-1.5 col-span-2">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Provincia destino <span class="text-red-400">*</span></label>
-            <select [(ngModel)]="completarForm.provincia"
-              class="cursor-pointer px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white">
-              <option value="">Seleccionar provincia...</option>
-              @for (prov of provincias; track prov) {
-                <option [value]="prov">{{ prov }}</option>
-              }
-            </select>
-          </div>
-        </div>
 
         <!-- HORARIO -->
         <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wide">
@@ -415,7 +438,9 @@
         </p>
         <div class="grid grid-cols-2 gap-3">
           <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Tipo <span class="text-red-400">*</span></label>
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">
+              Tipo <span class="text-red-400">*</span>
+            </label>
             <select [(ngModel)]="completarForm.tipoProductoId"
               class="cursor-pointer px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white">
               <option [value]="0">Seleccionar...</option>
@@ -437,7 +462,9 @@
         </p>
         <div class="grid grid-cols-2 gap-3">
           <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Método <span class="text-red-400">*</span></label>
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">
+              Método <span class="text-red-400">*</span>
+            </label>
             <select [(ngModel)]="completarForm.metodoPago"
               class="cursor-pointer px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white">
               <option value="">Seleccionar...</option>
@@ -459,7 +486,8 @@
         <!-- NOTA -->
         <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex gap-2 text-xs text-slate-500">
           <i class="fa fa-circle-info mt-0.5 shrink-0"></i>
-          El envío se creará con el solicitante como remitente y quedará en estado <span class="font-bold text-black">Por salir</span>.
+          El envío se creará con el solicitante como remitente y quedará en estado
+          <span class="font-bold text-black">Por salir</span>.
         </div>
 
       </div>

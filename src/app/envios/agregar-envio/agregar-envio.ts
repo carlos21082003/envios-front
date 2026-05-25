@@ -17,7 +17,7 @@ import { SedeService } from '../../sede/service/sede-service';
   styleUrl: './agregar-envio.css',
 })
 export class AgregarEnvio {
- private enviosService       = inject(EnviosService);
+  private enviosService       = inject(EnviosService);
   private router              = inject(Router);
   private tipoProductoService = inject(TipoProductoService);
   private route               = inject(ActivatedRoute);
@@ -31,27 +31,26 @@ export class AgregarEnvio {
   exitoso       = signal(false);
   modoVer       = signal(false);
   envioId       = signal<number | null>(null);
+  codigoEnvio   = signal<string | null>(null);
 
   EstadoEnvio = EstadoEnvio;
   EstadoPago  = EstadoPago;
 
   form = {
-    nombreRemitente:       '',
-    dniRemitente:          '',
-    nombreDestinatario:    '',
-    dniDestinatario:       '',
-    provincia:             '',
-    horaSalida:            '',
-    horaLlegada:           '',
-    fechaEnvio:            '',
-    estadoEnvio:           EstadoEnvio.PORSALIR,
+    nombreRemitente:         '',
+    dniRemitente:            '',
+    nombreDestinatario:      '',
+    dniDestinatario:         '',
+    provincia:               '',
+    horaSalida:              '',
+    horaLlegada:             '',
+    fechaEnvio:              '',
+    estadoEnvio:             EstadoEnvio.PORSALIR,
     nombrePersonaAutorizada: '',
     dniPersonaAutorizada:    '',
-    producto: {
-      tipoProductoId:  0,
-      descripcion:     '',
-      numeroPaquetes:  1,
-    },
+    productos: [
+      { tipoProductoId: 0, descripcion: '', numeroPaquetes: 1 }
+    ],
     pago: {
       monto:      0,
       metodoPago: '',
@@ -68,6 +67,23 @@ export class AgregarEnvio {
     'San Miguel', 'San Pablo', 'Santa Cruz'
   ];
 
+  get totalEstimado(): number {
+    return this.form.productos.reduce((acc, prod) => {
+      const tipo = this.tiposProducto().find(t => t.id === prod.tipoProductoId);
+      return acc + (tipo?.precioBase ?? 0) * prod.numeroPaquetes;
+    }, 0);
+  }
+
+  agregarProducto(): void {
+    this.form.productos.push({ tipoProductoId: 0, descripcion: '', numeroPaquetes: 1 });
+  }
+
+  eliminarProducto(index: number): void {
+    if (this.form.productos.length > 1) {
+      this.form.productos.splice(index, 1);
+    }
+  }
+
   ngOnInit(): void {
     this.cargarTiposProducto();
     this.cargarSedes();
@@ -82,21 +98,15 @@ export class AgregarEnvio {
 
   cargarSedes(): void {
     this.sedeService.listarActivas().subscribe({
-      next: (sedes) => {
-        console.log('Sedes cargadas:', sedes);
-        this.sedes.set(sedes);
-      },
-      error: () => console.error('Error al cargar sedes')
+      next:  (sedes) => this.sedes.set(sedes),
+      error: () => console.error('Error al cargar sedes'),
     });
   }
 
   cargarTiposProducto(): void {
     this.tipoProductoService.listarPaginado(0, 50).subscribe({
-      next: (res) => {
-        console.log('Tipos de producto:', res.content);
-        this.tiposProducto.set(res.content);
-      },
-      error: () => console.error('Error al cargar tipos de producto')
+      next:  (res) => this.tiposProducto.set(res.content),
+      error: () => console.error('Error al cargar tipos de producto'),
     });
   }
 
@@ -104,6 +114,7 @@ export class AgregarEnvio {
     this.cargando.set(true);
     this.enviosService.getEnvioById(id).subscribe({
       next: (envio) => {
+        this.codigoEnvio.set(envio.codigoEnvio ?? null);
         this.form = {
           nombreRemitente:         envio.nombreRemitente,
           dniRemitente:            envio.dniRemitente,
@@ -116,18 +127,18 @@ export class AgregarEnvio {
           estadoEnvio:             envio.estadoEnvio,
           nombrePersonaAutorizada: envio.nombrePersonaAutorizada ?? '',
           dniPersonaAutorizada:    envio.dniPersonaAutorizada ?? '',
-          producto: {
-            tipoProductoId:  envio.producto?.tipoProductoId ?? 0,
-            descripcion:     envio.producto?.descripcion ?? '',
-            numeroPaquetes:  envio.producto?.numeroPaquetes ?? 1,
-          },
+          productos: envio.productos?.map(p => ({
+            tipoProductoId: p.tipoProductoId ?? 0,
+            descripcion:    p.descripcion    ?? '',
+            numeroPaquetes: p.numeroPaquetes ?? 1,
+          })) ?? [{ tipoProductoId: 0, descripcion: '', numeroPaquetes: 1 }],
           pago: {
-            monto:      envio.pago?.monto ?? 0,
+            monto:      envio.pago?.monto      ?? 0,
             metodoPago: envio.pago?.metodoPago ?? '',
             fechaPago:  envio.pago?.fechaPago?.slice(0, 16) ?? '',
             estadoPago: envio.pago?.estadoPago ?? EstadoPago.PAGADO,
           },
-          sedeOrigenId:  envio.sedeId ?? null,
+          sedeOrigenId:  envio.sedeId        ?? null,
           sedeDestinoId: envio.sedeDestinoId ?? null,
         };
         this.cargando.set(false);
@@ -135,14 +146,14 @@ export class AgregarEnvio {
       error: () => {
         this.errorGuardar.set('No se pudo cargar el envío.');
         this.cargando.set(false);
-      }
+      },
     });
   }
 
   guardar(): void {
     if (this.modoVer()) return;
 
-    // validaciones básicas
+    // Validaciones
     if (!this.form.sedeOrigenId) {
       this.errorGuardar.set('Debes seleccionar la sede de origen.');
       return;
@@ -151,8 +162,9 @@ export class AgregarEnvio {
       this.errorGuardar.set('Debes seleccionar la sede destino.');
       return;
     }
-    if (!this.form.producto.tipoProductoId) {
-      this.errorGuardar.set('Debes seleccionar el tipo de producto.');
+    const productoSinTipo = this.form.productos.some(p => !p.tipoProductoId);
+    if (productoSinTipo) {
+      this.errorGuardar.set('Debes seleccionar el tipo de producto en todos los productos.');
       return;
     }
 
@@ -170,20 +182,20 @@ export class AgregarEnvio {
       fechaEnvio:              new Date(this.form.fechaEnvio).toISOString(),
       estadoEnvio:             this.form.estadoEnvio,
       nombrePersonaAutorizada: this.form.nombrePersonaAutorizada || null,
-      dniPersonaAutorizada:    this.form.dniPersonaAutorizada || null,
-      sedeId:                  this.form.sedeOrigenId,      // sede que registra
-      sedeOrigenId:            this.form.sedeOrigenId,      // para validar ruta
-      sedeDestinoId:           this.form.sedeDestinoId,     // para validar ruta
-      producto: {
-        tipoProductoId: this.form.producto.tipoProductoId,
-        descripcion:    this.form.producto.descripcion,
-        numeroPaquetes: this.form.producto.numeroPaquetes,
-      },
+      dniPersonaAutorizada:    this.form.dniPersonaAutorizada    || null,
+      sedeId:                  this.form.sedeOrigenId,
+      sedeOrigenId:            this.form.sedeOrigenId,
+      sedeDestinoId:           this.form.sedeDestinoId,
+      productos: this.form.productos.map(p => ({
+        tipoProductoId: p.tipoProductoId,
+        descripcion:    p.descripcion,
+        numeroPaquetes: p.numeroPaquetes,
+      })),
       pago: {
         metodoPago: this.form.pago.metodoPago,
         fechaPago:  new Date(this.form.pago.fechaPago).toISOString(),
         estadoPago: this.form.pago.estadoPago,
-      }
+      },
     };
 
     this.enviosService.guardarEnvio(dto).subscribe({
@@ -198,7 +210,7 @@ export class AgregarEnvio {
           err?.error?.message ?? 'Ocurrió un error al guardar el envío. Verifica que la ruta esté habilitada.'
         );
         this.guardando.set(false);
-      }
+      },
     });
   }
 

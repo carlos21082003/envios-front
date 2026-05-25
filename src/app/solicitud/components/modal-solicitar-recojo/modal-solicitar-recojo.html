@@ -47,7 +47,6 @@
       <div class="flex flex-col gap-1.5">
         <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">
           Sede destino del paquete
-          <span class="text-slate-400 normal-case font-normal ml-1">— opcional</span>
         </label>
         <select [(ngModel)]="form.sedeDestinoId"
           class="cursor-pointer px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white">
@@ -56,10 +55,6 @@
             <option [value]="sede.id">{{ sede.nombre }} — {{ sede.provincia }}</option>
           }
         </select>
-        <p class="text-xs text-slate-400">
-          <i class="fa fa-circle-info mr-1"></i>
-          Si el cliente sabe a qué sede va el paquete, selecciónala aquí.
-        </p>
       </div>
 
       <!-- DATOS SOLICITANTE -->
@@ -86,6 +81,41 @@
             Teléfono <span class="text-red-400">*</span>
           </label>
           <input [(ngModel)]="form.telefono" type="text" placeholder="999 888 777"
+            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+        </div>
+      </div>
+
+      <!-- DESTINATARIO DEL ENVÍO -->
+      <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wide">
+        <i class="fa fa-location-dot mr-1"></i> A quien esta dirijido el envío
+      </p>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Nombre</label>
+          <input [(ngModel)]="form.nombreDestinatario" type="text" placeholder="Nombre completo"
+            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">DNI</label>
+          <input [(ngModel)]="form.dniDestinatario" type="text" maxlength="8" placeholder="12345678"
+            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+        </div>
+      </div>
+
+      <!-- PERSONA QUE RECIBE -->
+      <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wide">
+        <i class="fa fa-id-card mr-1"></i> Persona autorizada para recoger
+        <span class="text-slate-400 normal-case font-normal ml-1">— Opcional</span>
+      </p>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Nombre</label>
+          <input [(ngModel)]="form.nombrePersonaRecibe" type="text" placeholder="Nombre completo"
+            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">DNI</label>
+          <input [(ngModel)]="form.dniPersonaRecibe" type="text" maxlength="8" placeholder="12345678"
             class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
         </div>
       </div>

@@ -75,15 +75,12 @@ export class Solicitud {
 
   completarFormVacio(): CompletarSolicitudDTO {
     return {
-      nombreDestinatario: '',
-      dniDestinatario:    '',
-      provincia:          '',
-      horaSalida:         '',
-      horaLlegada:        '',
-      tipoProductoId:     0,
-      numeroPaquetes:     1,
-      metodoPago:         '',
-      estadoPago:         'PAGADO',
+      horaSalida:     '',
+      horaLlegada:    '',
+      tipoProductoId: 0,
+      numeroPaquetes: 1,
+      metodoPago:     '',
+      estadoPago:     'PAGADO',
     };
   }
 
@@ -169,13 +166,11 @@ export class Solicitud {
   // completar según tipo
   iniciarCompletar(solicitud: SolicitudDTO): void {
     if (solicitud.tipo === TipoSolicitud.DELIVERY) {
-      // delivery: completar directo sin datos extra
       this.solicitudService.completarDelivery(solicitud.id!).subscribe({
         next: () => { this.mostrarExitoso('Solicitud completada.'); this.recargar(); },
         error: () => this.errorMsg.set('Error al completar.')
       });
     } else {
-      // recojo: abrir modal para datos del envío
       this.solicitudACompletar.set(solicitud);
       this.completarForm = this.completarFormVacio();
       this.errorCompletar.set(null);
@@ -186,17 +181,16 @@ export class Solicitud {
   confirmarCompletar(): void {
     const solicitud = this.solicitudACompletar();
     if (!solicitud?.id) return;
-
-    if (!this.completarForm.nombreDestinatario || !this.completarForm.dniDestinatario ||
-        !this.completarForm.provincia || !this.completarForm.tipoProductoId ||
-        !this.completarForm.metodoPago) {
-      this.errorCompletar.set('Completa todos los campos obligatorios.');
+    
+    // ACTUALIZADO: ya no valida destinatario ni provincia (vienen del recojo)
+    if (!this.completarForm.tipoProductoId || !this.completarForm.metodoPago) {
+      this.errorCompletar.set('Selecciona el tipo de producto y método de pago.');
       return;
     }
-
+  
     this.guardandoCompletar.set(true);
     this.errorCompletar.set(null);
-
+  
     this.solicitudService.completarRecojo(solicitud.id, this.completarForm).subscribe({
       next: () => {
         this.guardandoCompletar.set(false);
@@ -210,7 +204,6 @@ export class Solicitud {
       }
     });
   }
-
   abrirModalRechazo(solicitud: SolicitudDTO): void {
     this.solicitudArechazar.set(solicitud);
     this.motivoRechazo.set('');

@@ -14,16 +14,17 @@ export interface SolicitudDTO {
   sedeId: number;
   sedeNombre?: string;
   envioId?: number;
+  codigoEnvio?: string;
   nombrePersonaRecibe?: string;
   dniPersonaRecibe?: string;
   sedeDestinoId?: number;
   sedeDestinoNombre?: string;
+  nombreDestinatario?: string;
+  dniDestinatario?: string;
+  provinciaDestino?: string;
 }
 
 export interface CompletarSolicitudDTO {
-  nombreDestinatario: string;
-  dniDestinatario: string;
-  provincia: string;
   horaSalida: string;
   horaLlegada: string;
   tipoProductoId: number;

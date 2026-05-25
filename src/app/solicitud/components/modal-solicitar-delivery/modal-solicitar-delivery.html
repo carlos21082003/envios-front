@@ -46,13 +46,14 @@
       <!-- N° ENVÍO -->
       <div class="flex flex-col gap-1.5">
         <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">
-          N° de envío <span class="text-red-400">*</span>
+          Código de envío <span class="text-red-400">*</span>
         </label>
-        <input [(ngModel)]="form.envioId" type="number" placeholder="Ej: 1042"
-          class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+        <input [(ngModel)]="form.codigoEnvio" type="text" maxlength="6"
+          placeholder="Ej: 048321"
+          class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all font-mono tracking-widest"/>
         <p class="text-xs text-slate-400">
           <i class="fa fa-circle-info mr-1"></i>
-          Número que el remitente recibió al registrar el envío.
+          Código de 6 dígitos que aparece en tu comprobante de envío.
         </p>
       </div>
 

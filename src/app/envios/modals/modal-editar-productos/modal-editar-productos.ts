@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ProductosService } from '../../../productos/service/productos-service';
 import { TipoProductoService } from '../../../productos/service/tipo-producto-service';
 import { TipoProductoDTO } from '../../../productos/models/tipo-producto';
+import { ProductosDTO } from '../../../productos/models/productos';
 
 @Component({
   selector: 'app-modal-editar-productos',
@@ -15,59 +16,66 @@ export class ModalEditarProductos implements OnInit {
   private productosService    = inject(ProductosService);
   private tipoProductoService = inject(TipoProductoService);
 
-  productoId  = input.required<number>();
+  // Recibe la lista completa del envío
+  productos   = input.required<ProductosDTO[]>();
   cerrar      = output<void>();
   actualizado = output<void>();
 
   tiposProducto = signal<TipoProductoDTO[]>([]);
   guardando     = signal(false);
-  cargando      = signal(true);
   error         = signal<string | null>(null);
 
-  form = {
-    tipoProductoId: 0,
-    descripcion:    '',
-    numeroPaquetes: 1,
-  };
+  // Copia local editable
+  forms = signal<{ id: number; tipoProductoId: number; descripcion: string; numeroPaquetes: number }[]>([]);
 
   ngOnInit(): void {
-    // carga tipos activos para el select
-    this.tipoProductoService.listarPaginado(0, 50, true).subscribe({
+    this.tipoProductoService.listarPaginado(0, 50).subscribe({
       next: (res) => this.tiposProducto.set(res.content),
-      error: () => console.error('Error al cargar tipos de producto')
+      error: () => console.error('Error al cargar tipos de producto'),
     });
 
-    // carga el producto actual
-    this.productosService.getProductoById(this.productoId()).subscribe({
-      next: (producto) => {
-        this.form = {
-          tipoProductoId: producto.tipoProductoId,
-          descripcion:    producto.descripcion,
-          numeroPaquetes: producto.numeroPaquetes,
-        };
-        this.cargando.set(false);
-      },
-      error: () => {
-        this.error.set('No se pudo cargar el producto.');
-        this.cargando.set(false);
-      }
-    });
+    // Inicializa el form con los productos recibidos
+    this.forms.set(
+      this.productos().map(p => ({
+        id:             p.id!,
+        tipoProductoId: p.tipoProductoId,
+        descripcion:    p.descripcion,
+        numeroPaquetes: p.numeroPaquetes,
+      }))
+    );
+  }
+
+  subtotal(form: { tipoProductoId: number; numeroPaquetes: number }): number {
+    const tipo = this.tiposProducto().find(t => t.id === form.tipoProductoId);
+    return (tipo?.precioBase ?? 0) * form.numeroPaquetes;
+  }
+
+  get totalEstimado(): number {
+    return this.forms().reduce((acc, f) => acc + this.subtotal(f), 0);
   }
 
   guardar(): void {
     this.guardando.set(true);
     this.error.set(null);
 
-    this.productosService.actualizarProducto(this.productoId(), this.form).subscribe({
-      next: () => {
+    // Actualiza cada producto en paralelo
+    const peticiones = this.forms().map(f =>
+      this.productosService.actualizarProducto(f.id, {
+        tipoProductoId: f.tipoProductoId,
+        descripcion:    f.descripcion,
+        numeroPaquetes: f.numeroPaquetes,
+      })
+    );
+
+    Promise.all(peticiones.map(p => p.toPromise()))
+      .then(() => {
         this.actualizado.emit();
         this.guardando.set(false);
         this.cerrar.emit();
-      },
-      error: () => {
-        this.error.set('No se pudo actualizar el producto.');
+      })
+      .catch(() => {
+        this.error.set('No se pudo actualizar uno o más productos.');
         this.guardando.set(false);
-      }
-    });
+      });
   }
 }

@@ -6,6 +6,7 @@ import { ModalEditarEnvio } from "./modals/modal-editar-envio/modal-editar-envio
 import { ModalEditarPagos } from "./modals/modal-editar-pagos/modal-editar-pagos";
 import { ModalEditarProductos } from "./modals/modal-editar-productos/modal-editar-productos";
 import { EstadoEnvio } from './models/estado-envio';
+import { AuthService } from '../auth/service/auth-service';
 
 @Component({
   selector: 'app-envios',
@@ -16,6 +17,7 @@ import { EstadoEnvio } from './models/estado-envio';
 export class Envios implements OnInit {
   private enviosService = inject(EnviosService);
   private router        = inject(Router);
+  private authService   = inject(AuthService);
 
   // Lista 
   envios        = signal<any[]>([]);
@@ -37,6 +39,8 @@ export class Envios implements OnInit {
   modalProducto = signal(false);
   envioSeleccionado = signal<any>(null);
 
+  productoSeleccionadoId = signal<number | null>(null);
+
   ngOnInit(): void {
     this.cargarEnvios();
   }
@@ -45,7 +49,11 @@ export class Envios implements OnInit {
     this.cargando.set(true);
     this.errorBusqueda.set(false);
 
-    this.enviosService.listarEnvios(this.paginaActual(), 15).subscribe({
+    const sedeId = this.authService.esSuperAdmin() 
+      ? undefined 
+      : this.authService.getSedeId() ?? undefined;
+
+    this.enviosService.listarEnvios(this.paginaActual(), 15, sedeId).subscribe({
       next: (response) => {
         this.envios.set(response.content);
         this.totalPaginas.set(response.totalPages);
@@ -68,7 +76,7 @@ export class Envios implements OnInit {
     }
     this.cargando.set(true);
     this.errorBusqueda.set(false);
-    this.enviosService.rastrearEnvio(dniLimpio).subscribe({
+    this.enviosService.rastrearEnvioEmpleados(dniLimpio).subscribe({
       next: (response) => {
         this.envios.set([response]);
         this.totalPaginas.set(1);

@@ -16,7 +16,7 @@ import { ModalSolicitarDelivery } from "../components/modal-solicitar-delivery/m
   styleUrl: './solicitud-usuario.css',
 })
 export class SolicitudUsuario implements OnInit {
-   private solicitudService = inject(SolicitudService);
+  private solicitudService = inject(SolicitudService);
   private sedeService      = inject(SedeService);
 
   TipoSolicitud   = TipoSolicitud;

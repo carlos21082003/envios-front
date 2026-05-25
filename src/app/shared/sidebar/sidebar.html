@@ -100,14 +100,6 @@
         </a>
       }
 
-      @if (hasRole('ADMIN', 'SUPER_ADMIN')) {
-        <a routerLink="/rutas"
-          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
-          class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
-          <i class="fa-solid fa-route w-5 text-center opacity-70 group-hover:opacity-100"></i>
-          <span>Rutas de Entrega</span>
-        </a>
-      }
 
       @if (hasRole('ADMIN', 'SUPER_ADMIN','EMPLEADO')) {
         <a routerLink="/pagos"
@@ -119,6 +111,11 @@
       }
 
       @if (hasRole('ADMIN', 'SUPER_ADMIN')) {
+
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 pt-6 pb-2">
+          Gestiones de administrador
+        </span>
+
         <a routerLink="/productos"
           routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
           class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
@@ -138,6 +135,13 @@
            class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
           <i class="fa-solid fa-user-gear w-5 text-center opacity-70 group-hover:opacity-100"></i>
           <span>Gestión de Usuarios</span>
+        </a>
+
+        <a routerLink="/rutas"
+          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+          class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+          <i class="fa-solid fa-route w-5 text-center opacity-70 group-hover:opacity-100"></i>
+          <span>Rutas de Entrega</span>
         </a>
       }
 

@@ -31,7 +31,7 @@ export class ModalSolicitarDelivery implements OnInit {
     telefono:            '',
     direccion:           '',
     referencia:          '',
-    envioId:             null as number | null,
+    codigoEnvio:         '',          
     nombrePersonaRecibe: '',
     dniPersonaRecibe:    '',
     sedeId:              0,
@@ -48,8 +48,8 @@ export class ModalSolicitarDelivery implements OnInit {
       this.errorMsg.set('Completa todos los campos obligatorios.');
       return;
     }
-    if (!this.form.envioId) {
-      this.errorMsg.set('Ingresa el número de envío para el delivery.');
+    if (!this.form.codigoEnvio || this.form.codigoEnvio.trim().length !== 6) {
+      this.errorMsg.set('Ingresa el código de envío de 6 dígitos.');
       return;
     }
 

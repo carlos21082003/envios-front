@@ -34,8 +34,13 @@ export class ModalSolicitarRecojo implements OnInit {
     direccion:           '',
     referencia:          '',
     descripcionProducto: '',
+    nombrePersonaRecibe: '',
+    dniPersonaRecibe:    '',
     sedeId:              0,
     sedeDestinoId:       0,
+    nombreDestinatario:  '',
+    dniDestinatario:     '',
+    provinciaDestino:    '',
   };
 
   ngOnInit(): void {

@@ -178,10 +178,10 @@
   }
 
   @if (modalProducto() && envioSeleccionado()) {
-  <app-modal-editar-productos
-    [productos]="envioSeleccionado().productos"
-    (cerrar)="modalProducto.set(false)"
-    (actualizado)="onActualizado()"/>
+    <app-modal-editar-productos
+      [productos]="productosModal()"
+      (cerrar)="modalProducto.set(false)"
+      (actualizado)="onActualizado()"/>
   }
 
 </div>

@@ -19,6 +19,8 @@ export class Envios implements OnInit {
   private router        = inject(Router);
   private authService   = inject(AuthService);
 
+  productosModal = signal<any[]>([]);
+
   // Lista 
   envios        = signal<any[]>([]);
   paginaActual  = signal<number>(0);
@@ -76,11 +78,12 @@ export class Envios implements OnInit {
     }
     this.cargando.set(true);
     this.errorBusqueda.set(false);
-    this.enviosService.rastrearEnvioEmpleados(dniLimpio).subscribe({
-      next: (response) => {
-        this.envios.set([response]);
+
+    this.enviosService.rastrearEnvio(dniLimpio).subscribe({
+      next: (response) => {                     
+        this.envios.set(response);           
         this.totalPaginas.set(1);
-        this.totalElementos.set(1);
+        this.totalElementos.set(response.length);
         this.paginaActual.set(0);
         this.cargando.set(false);
       },
@@ -137,10 +140,12 @@ export class Envios implements OnInit {
 
   abrirModalProducto(envio: any): void {
     this.envioSeleccionado.set(envio);
+    this.productosModal.set([...envio.productos]); 
     this.modalProducto.set(true);
   }
 
   onActualizado(): void {
     this.cargarEnvios();
+    this.modalProducto.set(false);
   }
 }

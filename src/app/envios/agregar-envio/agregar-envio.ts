@@ -9,6 +9,8 @@ import { EstadoEnvio } from '../models/estado-envio';
 import { EnviosService } from '../service/envios-service';
 import { SedeDTO } from '../../sede/models/sede';
 import { SedeService } from '../../sede/service/sede-service';
+import { TarifaService } from '../../tarifas/service/tarifa-service';
+import { TarifaAdicional } from '../../tarifas/models/tarifa';
 
 @Component({
   selector: 'app-agregar-envio',
@@ -22,9 +24,12 @@ export class AgregarEnvio {
   private tipoProductoService = inject(TipoProductoService);
   private route               = inject(ActivatedRoute);
   private sedeService         = inject(SedeService);
+  private tarifaService       = inject(TarifaService);         
 
+  _cambio = signal(0);
   tiposProducto = signal<TipoProductoDTO[]>([]);
   sedes         = signal<SedeDTO[]>([]);
+  tarifa        = signal<TarifaAdicional | null>(null);         
   guardando     = signal(false);
   cargando      = signal(false);
   errorGuardar  = signal<string | null>(null);
@@ -49,7 +54,7 @@ export class AgregarEnvio {
     nombrePersonaAutorizada: '',
     dniPersonaAutorizada:    '',
     productos: [
-      { tipoProductoId: 0, descripcion: '', numeroPaquetes: 1 }
+      { tipoProductoId: 0, descripcion: '', numeroPaquetes: 1, peso: 0, volumen: 0 }
     ],
     pago: {
       monto:      0,
@@ -67,15 +72,37 @@ export class AgregarEnvio {
     'San Miguel', 'San Pablo', 'Santa Cruz'
   ];
 
+  forzarActualizacion(): void {
+    this._cambio.update(v => v + 1);
+  }
+
+  // recargoEstimado — agregar
+  get recargoEstimado(): number {
+    this._cambio();
+    const t = this.tarifa();
+    if (!t) return 0;
+
+    const pesoTotal    = this.form.productos.reduce((acc, p) => acc + (p.peso    ?? 0) * p.numeroPaquetes, 0);
+    const volumenTotal = this.form.productos.reduce((acc, p) => acc + (p.volumen ?? 0) * p.numeroPaquetes, 0);
+
+    let recargo = 0;
+    if (pesoTotal    > t.limitePeso)    recargo += (pesoTotal    - t.limitePeso)    * t.recargoPeso;
+    if (volumenTotal > t.limiteVolumen) recargo += (volumenTotal - t.limiteVolumen) * t.recargoVolumen;
+    return recargo;
+  }
+
+  // totalEstimado — actualizar para incluir recargo
   get totalEstimado(): number {
-    return this.form.productos.reduce((acc, prod) => {
+    this._cambio();
+    const base = this.form.productos.reduce((acc, prod) => {
       const tipo = this.tiposProducto().find(t => t.id === prod.tipoProductoId);
       return acc + (tipo?.precioBase ?? 0) * prod.numeroPaquetes;
     }, 0);
+    return base + this.recargoEstimado;
   }
 
   agregarProducto(): void {
-    this.form.productos.push({ tipoProductoId: 0, descripcion: '', numeroPaquetes: 1 });
+    this.form.productos.push({ tipoProductoId: 0, descripcion: '', numeroPaquetes: 1, peso: 0, volumen: 0 });
   }
 
   eliminarProducto(index: number): void {
@@ -87,6 +114,7 @@ export class AgregarEnvio {
   ngOnInit(): void {
     this.cargarTiposProducto();
     this.cargarSedes();
+    this.cargarTarifa();   // agregar
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -94,6 +122,13 @@ export class AgregarEnvio {
       this.envioId.set(Number(id));
       this.cargarEnvio(Number(id));
     }
+  }
+
+  cargarTarifa(): void {   // agregar
+    this.tarifaService.getTarifaVigente().subscribe({
+      next:  (t) => this.tarifa.set(t),
+      error: () => console.warn('Sin tarifa configurada'),
+    });
   }
 
   cargarSedes(): void {
@@ -126,12 +161,14 @@ export class AgregarEnvio {
           fechaEnvio:              envio.fechaEnvio?.slice(0, 16) ?? '',
           estadoEnvio:             envio.estadoEnvio,
           nombrePersonaAutorizada: envio.nombrePersonaAutorizada ?? '',
-          dniPersonaAutorizada:    envio.dniPersonaAutorizada ?? '',
+          dniPersonaAutorizada:    envio.dniPersonaAutorizada    ?? '',
           productos: envio.productos?.map(p => ({
             tipoProductoId: p.tipoProductoId ?? 0,
             descripcion:    p.descripcion    ?? '',
             numeroPaquetes: p.numeroPaquetes ?? 1,
-          })) ?? [{ tipoProductoId: 0, descripcion: '', numeroPaquetes: 1 }],
+            peso:           p.peso           ?? 0,
+            volumen:        p.volumen        ?? 0,
+          })) ?? [{ tipoProductoId: 0, descripcion: '', numeroPaquetes: 1, peso: 0, volumen: 0 }],
           pago: {
             monto:      envio.pago?.monto      ?? 0,
             metodoPago: envio.pago?.metodoPago ?? '',
@@ -153,7 +190,6 @@ export class AgregarEnvio {
   guardar(): void {
     if (this.modoVer()) return;
 
-    // Validaciones
     if (!this.form.sedeOrigenId) {
       this.errorGuardar.set('Debes seleccionar la sede de origen.');
       return;
@@ -190,6 +226,8 @@ export class AgregarEnvio {
         tipoProductoId: p.tipoProductoId,
         descripcion:    p.descripcion,
         numeroPaquetes: p.numeroPaquetes,
+        peso:           p.peso,
+        volumen:        p.volumen,
       })),
       pago: {
         metodoPago: this.form.pago.metodoPago,

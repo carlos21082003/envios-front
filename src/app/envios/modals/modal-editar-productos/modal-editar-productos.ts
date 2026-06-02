@@ -16,6 +16,7 @@ export class ModalEditarProductos implements OnInit {
   private productosService    = inject(ProductosService);
   private tipoProductoService = inject(TipoProductoService);
 
+  formListo = false;
   // Recibe la lista completa del envío
   productos   = input.required<ProductosDTO[]>();
   cerrar      = output<void>();
@@ -26,24 +27,45 @@ export class ModalEditarProductos implements OnInit {
   error         = signal<string | null>(null);
 
   // Copia local editable
-  forms = signal<{ id: number; tipoProductoId: number; descripcion: string; numeroPaquetes: number }[]>([]);
+  forms = signal<{ id: number; tipoProductoId: number; descripcion: string; numeroPaquetes: number; peso: number; volumen: number }[]>([]);
 
-  ngOnInit(): void {
-    this.tipoProductoService.listarPaginado(0, 50).subscribe({
-      next: (res) => this.tiposProducto.set(res.content),
-      error: () => console.error('Error al cargar tipos de producto'),
-    });
+ngOnInit(): void {
+  this.forms.set(
+    this.productos().map(p => ({
+      id:             p.id!,
+      tipoProductoId: p.tipoProductoId,
+      descripcion:    p.descripcion || '',
+      numeroPaquetes: Number(p.numeroPaquetes),
+      peso:           Number(p.peso    ?? 0),
+      volumen:        Number(p.volumen ?? 0),
+    }))
+  );
 
-    // Inicializa el form con los productos recibidos
-    this.forms.set(
-      this.productos().map(p => ({
-        id:             p.id!,
-        tipoProductoId: p.tipoProductoId,
-        descripcion:    p.descripcion,
-        numeroPaquetes: p.numeroPaquetes,
-      }))
-    );
+  this.tipoProductoService.listarPaginado(0, 50).subscribe({
+    next: (res) => {
+      this.tiposProducto.set(res.content);
+      // Delay mínimo para que Angular termine el render inicial
+      setTimeout(() => {
+        this.formListo = true;
+        console.log('formListo activado');
+      }, 0);
+    },
+    error: () => console.error('Error al cargar tipos de producto'),
+  });
+}
+
+actualizarForm(index: number, campo: string, valor: any): void {
+  if (!this.formListo) {
+    console.warn('IGNORADO', campo, valor);
+    return;
   }
+  const copia = [...this.forms()];
+  const valorFinal = ['numeroPaquetes', 'peso', 'volumen'].includes(campo)
+    ? Number(valor)
+    : valor;
+  copia[index] = { ...copia[index], [campo]: valorFinal };
+  this.forms.set(copia);
+}
 
   subtotal(form: { tipoProductoId: number; numeroPaquetes: number }): number {
     const tipo = this.tiposProducto().find(t => t.id === form.tipoProductoId);
@@ -64,6 +86,8 @@ export class ModalEditarProductos implements OnInit {
         tipoProductoId: f.tipoProductoId,
         descripcion:    f.descripcion,
         numeroPaquetes: f.numeroPaquetes,
+        peso:           f.peso,    
+        volumen:        f.volumen, 
       })
     );
 

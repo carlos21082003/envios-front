@@ -1,8 +1,10 @@
 export interface ProductosDTO {
   id?: number;
-  tipoProductoId: number;      
-  tipoProductoNombre?: string;  
+  tipoProductoId: number;
+  tipoProductoNombre?: string;
   descripcion: string;
-  numeroPaquetes: number;
+  numeroPaquetes: number;  
+  peso?: number;
+  volumen?: number;
   precioPorProducto?: number;
 }

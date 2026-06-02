@@ -35,17 +35,12 @@ export class EnviosService {
   }
 
   rastrearEnvio(dniRemitente: string): Observable<any[]> {
-  return this.http.get<any>(`${this.urlEnvios}/rastrear/${dniRemitente}`).pipe(
-    map(res => Array.isArray(res) ? res : [res]), 
-    catchError((error) => { console.error('Error al rastrear envío:', error); throw error; })
-  );
-}
-
-  rastrearEnvioEmpleados(dniRemitente: string): Observable<any> {
-    return this.http.get<any>(`${this.urlEnvios}/buscarcliente/${dniRemitente}`).pipe(
+    return this.http.get<any>(`${this.urlEnvios}/rastrear/${dniRemitente}`).pipe(
+      map(res => Array.isArray(res) ? res : [res]),
       catchError((error) => { console.error('Error al rastrear envío:', error); throw error; })
     );
   }
+
 
   actualizarEnvio(id: number, envio: Partial<Envios>): Observable<Envios> {
     return this.http.put<Envios>(`${this.urlEnvios}/${id}`, envio).pipe(

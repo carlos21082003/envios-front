@@ -16,6 +16,8 @@ export interface Envios {
   pago: PagosDTO;
   productos: ProductosDTO[];
   provincia: string;
+  pesoTotal?: number;     
+  volumenTotal?: number;
   sedeId?: number;
   sedeNombre?: string;
   nombrePersonaAutorizada?: string | null;  

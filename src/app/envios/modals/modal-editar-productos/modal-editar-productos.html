@@ -11,7 +11,7 @@
         <p class="text-xs text-slate-400 mt-0.5">{{ forms().length }} producto(s) en este envío</p>
       </div>
       <button (click)="cerrar.emit()"
-        class="w-8 h-8 flex items-center cursor-pointer justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-black hover:bg-slate-50 transition-all">
+        class="w-8 h-8 flex items-center cursor-pointer justify-center rounded-lg border border-slate-200 text-slate.400 hover:text-black hover:bg-slate-50 transition-all">
         <i class="fa-solid fa-xmark text-sm"></i>
       </button>
     </div>
@@ -25,8 +25,9 @@
 
           <div class="flex flex-col gap-1.5">
             <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Tipo</label>
-            <select [(ngModel)]="form.tipoProductoId"
-              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all bg-white">
+            <select [ngModel]="form.tipoProductoId"
+                    (ngModelChange)="actualizarForm($index, 'tipoProductoId', $event)"
+                    class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all bg-white">
               <option [ngValue]="0">Seleccionar...</option>
               @for (tipo of tiposProducto(); track tipo.id) {
                 <option [ngValue]="tipo.id">{{ tipo.nombre }}</option>
@@ -37,8 +38,10 @@
           <div class="flex gap-3">
             <div class="flex flex-col gap-1.5 flex-1">
               <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">N° paquetes</label>
-              <input [(ngModel)]="form.numeroPaquetes" type="number" min="1"
-                class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all"/>
+              <input [ngModel]="form.numeroPaquetes|| null"
+                     (ngModelChange)="actualizarForm($index, 'numeroPaquetes', $event)"
+                     type="number" placeholder="0"
+                     class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all"/>
             </div>
             <div class="flex flex-col gap-1.5 flex-1">
               <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Subtotal</label>
@@ -48,10 +51,29 @@
             </div>
           </div>
 
+          <div class="flex gap-3">
+            <div class="flex flex-col gap-1.5 flex-1">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Peso (kg)</label>
+              <input [ngModel]="form.peso || null"
+                     (ngModelChange)="actualizarForm($index, 'peso', $event)"
+                     type="number" placeholder="0.0" min="0"
+                     class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all"/>
+            </div>
+            <div class="flex flex-col gap-1.5 flex-1">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Volumen (m³)</label>
+              <input [ngModel]="form.volumen || null"
+                     (ngModelChange)="actualizarForm($index, 'volumen', $event)"
+                     type="number"  placeholder="0.0" min="0"
+                     class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all"/>
+            </div>
+          </div>
+
           <div class="flex flex-col gap-1.5">
             <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Descripción</label>
-            <textarea [(ngModel)]="form.descripcion" rows="2"
-              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all resize-none"></textarea>
+            <textarea [ngModel]="form.descripcion"
+                      (ngModelChange)="actualizarForm($index, 'descripcion', $event)"
+                      rows="2"
+                      class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all resize-none"></textarea>
           </div>
 
         </div>

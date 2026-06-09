@@ -22,43 +22,75 @@
       </div>
     } @else {
       <div class="flex flex-col gap-4 mb-5">
-    
-        <!-- monto solo lectura -->
+
+        <!-- Monto solo lectura -->
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">
             Monto (S/.) <span class="text-slate-400 normal-case font-normal">— calculado automáticamente</span>
           </label>
-          <input
-            [value]="montoActual()"
-            type="number" disabled
+          <input [value]="montoActual()" type="number" disabled
             class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-500 cursor-not-allowed"/>
         </div>
-    
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Método de pago</label>
-          <select [(ngModel)]="form.metodoPago"
-            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white">
-            <option value="EFECTIVO">Efectivo</option>
-            <option value="TRANSFERENCIA">Transferencia</option>
-          </select>
-        </div>
-    
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Fecha de pago</label>
-          <input [(ngModel)]="form.fechaPago" type="datetime-local"
-            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
-        </div>
-    
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Estado del pago</label>
-          <select [(ngModel)]="form.estadoPago"
-            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white">
-            <option [value]="EstadoPago.PAGADO">Pagado</option>
-            <option [value]="EstadoPago.PENDIENTE">Pendiente</option>
-            <option [value]="EstadoPago.PAGADOALRECOGER">Pagado al recoger</option>
-          </select>
-        </div>
-    
+
+        @if (soloLectura()) {
+
+          <!-- Vista solo lectura para pagos en línea -->
+          <div class="p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+            <i class="fa fa-circle-check text-green-500 text-lg"></i>
+            <div>
+              <p class="text-xs font-bold text-green-700 uppercase tracking-wide">Pagado en línea</p>
+              <p class="text-xs text-green-600 mt-0.5">Este pago fue procesado en línea y no puede modificarse.</p>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Método de pago</label>
+            <input [value]="form.metodoPago" disabled
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-500 cursor-not-allowed"/>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Fecha de pago</label>
+            <input [value]="form.fechaPago" type="datetime-local" disabled
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-500 cursor-not-allowed"/>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Estado</label>
+            <input value="Pagado en línea" disabled
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-500 cursor-not-allowed"/>
+          </div>
+
+        } @else {
+
+          <!-- Formulario editable -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Método de pago</label>
+            <select [(ngModel)]="form.metodoPago"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white">
+              <option value="EFECTIVO">Efectivo</option>
+              <option value="TRANSFERENCIA">Transferencia</option>
+            </select>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Fecha de pago</label>
+            <input [(ngModel)]="form.fechaPago" type="datetime-local"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Estado del pago</label>
+            <select [(ngModel)]="form.estadoPago"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all bg-white">
+              <option [value]="EstadoPago.PAGADO">Pagado</option>
+              <option [value]="EstadoPago.PENDIENTE">Pendiente</option>
+              <option [value]="EstadoPago.PAGADOALRECOGER">Pagado al recoger</option>
+            </select>
+          </div>
+
+        }
+
       </div>
     }
 
@@ -71,16 +103,18 @@
     <div class="flex gap-2">
       <button (click)="cerrar.emit()"
         class="flex-1 py-2.5 cursor-pointer border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">
-        Cancelar
+        {{ soloLectura() ? 'Cerrar' : 'Cancelar' }}
       </button>
-      <button (click)="guardar()" [disabled]="guardando() || cargando()"
-        class="flex-1 py-2.5 cursor-pointer bg-black text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-        @if (guardando()) {
-          <i class="fa fa-spinner fa-spin"></i> Guardando...
-        } @else {
-          Actualizar
-        }
-      </button>
+      @if (!soloLectura()) {
+        <button (click)="guardar()" [disabled]="guardando() || cargando()"
+          class="flex-1 py-2.5 cursor-pointer bg-black text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+          @if (guardando()) {
+            <i class="fa fa-spinner fa-spin"></i> Guardando...
+          } @else {
+            Actualizar
+          }
+        </button>
+      }
     </div>
 
   </div>

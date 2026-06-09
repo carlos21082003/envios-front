@@ -1,204 +1,251 @@
-<div class="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-slate-900">
+<div class="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 md:p-8 text-slate-800 antialiased selection:bg-black selection:text-white">
 
-  <!-- Logo -->
-  <div class="text-center mb-10">
-    <div class="bg-black text-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-      <i class="fa-solid fa-box-open text-2xl"></i>
+  <!-- ==========================================
+       LOGO / ENCABEZADO
+       ========================================== -->
+  <div class="text-center mb-8 max-w-sm">
+    <div class="bg-black text-white w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-black/10 ring-4 ring-white">
+      <i class="fa-solid fa-box-open text-xl"></i>
     </div>
-    <h1 class="text-3xl font-extrabold text-black tracking-tight">Rastrea tu Envío</h1>
-    <p class="text-slate-500 mt-2 text-sm">Ingresa el DNI del remitente para conocer el estado actual de tu paquete.</p>
+    <h1 class="text-2xl font-black text-black tracking-tight uppercase">Rastrea tu Envío</h1>
+    <p class="text-slate-500 mt-1.5 text-xs font-medium px-4">Ingresa el DNI del remitente para conocer el estado actual de tu paquete en tiempo real.</p>
   </div>
 
-  <!-- Buscador -->
-  <div class="w-full max-w-md bg-white p-2 rounded-2xl border border-slate-200 shadow-sm mb-8 flex items-center gap-2">
+  <!-- ==========================================
+       BUSCADOR
+       ========================================== -->
+  <div class="w-full max-w-xl bg-white p-2 rounded-2xl border border-slate-200/80 shadow-md shadow-slate-100/50 mb-6 flex items-center gap-2 focus-within:border-black focus-within:ring-4 focus-within:ring-black/5 transition-all duration-300">
     <div class="relative flex-1">
-      <i class="fa-solid fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+      <i class="fa-solid fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-base"></i>
       <input
         [(ngModel)]="dni"
         (keyup.enter)="buscar()"
         type="text"
-        placeholder="DNI del remitente"
+        placeholder="Escribe el DNI del remitente..."
         maxlength="8"
-        class="w-full pl-11 pr-4 py-3 bg-transparent outline-none text-sm font-medium"/>
+        class="w-full pl-11 pr-4 py-3 bg-transparent outline-none text-sm font-semibold text-slate-900 placeholder:text-slate-400 placeholder:font-normal"/>
     </div>
+    
     @if (envios().length > 0) {
       <button (click)="limpiar()"
-        class="cursor-pointer p-3 rounded-xl text-slate-400 hover:text-black hover:bg-slate-50 transition-all">
-        <i class="fa-solid fa-xmark"></i>
+        class="cursor-pointer p-3 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all duration-200"
+        title="Limpiar búsqueda">
+        <i class="fa-solid fa-xmark text-sm"></i>
       </button>
     }
+    
     <button (click)="buscar()" [disabled]="cargando()"
-      class="cursor-pointer bg-black text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-slate-800 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+      class="cursor-pointer bg-black text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-slate-800 active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center min-w-27.5">
       @if (cargando()) {
-        <i class="fa fa-spinner fa-spin"></i>
+        <i class="fa fa-spinner fa-spin text-sm"></i>
       } @else {
-        Rastrear
+        <span>Buscar</span>
       }
     </button>
   </div>
 
-  <!-- Skeleton -->
+  <!-- ==========================================
+       SKELETON LOADING
+       ========================================== -->
   @if (cargando()) {
-    <div class="w-full max-w-2xl bg-white rounded-3xl border border-slate-200 p-8 animate-pulse">
-      <div class="h-6 bg-slate-100 rounded w-1/3 mb-4"></div>
-      <div class="h-20 bg-slate-50 rounded-2xl mb-4"></div>
-      <div class="h-20 bg-slate-50 rounded-2xl"></div>
+    <div class="w-full max-w-xl bg-white rounded-3xl border border-slate-200 p-6 space-y-4 animate-pulse">
+      <div class="h-4 bg-slate-200 rounded-md w-1/4"></div>
+      <div class="h-24 bg-slate-100 rounded-2xl"></div>
+      <div class="h-32 bg-slate-100 rounded-2xl"></div>
     </div>
   }
 
-  <!-- Selector de envíos (solo si hay más de uno) -->
+  <!-- ==========================================
+       SELECTOR DE ENVÍOS (Múltiples resultados)
+       ========================================== -->
   @if (envios().length > 1) {
-    <div class="w-full max-w-2xl mb-4 flex flex-col gap-2">
-      <p class="text-xs font-bold text-slate-400 uppercase tracking-wide px-1">
-        {{ envios().length }} envíos encontrados — selecciona uno
+    <div class="w-full max-w-xl mb-6 flex flex-col gap-2">
+      <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider px-1">
+        {{ envios().length }} envíos asociados — Selecciona uno:
       </p>
-      @for (e of envios(); track e.id) {
-        <button
-          (click)="seleccionar(e)"
-          class="w-full text-left px-4 py-3 rounded-2xl border transition-all text-sm font-medium flex justify-between items-center"
-          [class]="envio()?.id === e.id
-            ? 'bg-black text-white border-black'
-            : 'bg-white text-slate-700 border-slate-200 hover:border-slate-400'">
-          <span>
-            <span class="font-mono font-bold">#{{ e.codigoEnvio }}</span>
-            <span class="ml-2 opacity-60">{{ e.fechaEnvio | date:'dd/MM/yyyy' }}</span>
-          </span>
-          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border"
-            [class]="badgeClase(e.estadoEnvio)">
-            {{ badgeTexto(e.estadoEnvio) }}
-          </span>
-        </button>
-      }
+      <div class="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+        @for (e of envios(); track e.id) {
+          <button
+            (click)="seleccionar(e)"
+            class="w-full text-left px-4 py-3.5 rounded-xl border transition-all duration-200 text-sm font-medium flex justify-between items-center group"
+            [class]="envio()?.id === e.id
+              ? 'bg-black text-white border-black shadow-lg shadow-black/10'
+              : 'bg-white text-slate-700 border-slate-200 hover:border-slate-400 hover:bg-slate-50'">
+            <span class="flex items-center gap-3">
+              <i class="fa-solid fa-box text-xs opacity-50 group-hover:scale-110 transition-transform"></i>
+              <span>
+                <span class="font-mono font-bold tracking-tight">#{{ e.codigoEnvio }}</span>
+                <span class="ml-2 text-xs opacity-60 font-normal border-l border-current pl-2">{{ e.fechaEnvio | date:'dd/MM/yyyy' }}</span>
+              </span>
+            </span>
+            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border shadow-sm"
+              [class]="badgeClase(e.estadoEnvio)">
+              {{ badgeTexto(e.estadoEnvio) }}
+            </span>
+          </button>
+        }
+      </div>
     </div>
   }
 
-  <!-- Resultado -->
+  <!-- ==========================================
+       RESULTADO DE DETALLE
+       ========================================== -->
   @if (envio(); as e) {
-    <div class="w-full max-w-2xl bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+    <div class="w-full max-w-xl bg-white rounded-3xl border border-slate-200/80 shadow-2xl shadow-slate-200/60 overflow-hidden transform transition-all duration-300">
 
-      <!-- Header negro -->
-      <div class="bg-black p-6 text-white flex justify-between items-start">
-        <div>
-          <p class="text-[10px] uppercase tracking-widest font-bold opacity-60 mb-1">Código de envío</p>
-          <h3 class="text-xl font-mono font-bold">#{{ e.codigoEnvio }}</h3>
-          <p class="text-xs text-white/60 mt-1">{{ e.sedeNombre || 'Agencia Cajamarca' }}</p>
+      <!-- Encabezado de Tarjeta -->
+      <div class="bg-linear-to-br from-slate-900 to-black p-6 text-white flex justify-between items-center relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 text-white/3 text-8xl font-black pointer-events-none select-none font-mono">
+          BOX
         </div>
-        <span class="px-3 py-1.5 rounded-full text-xs font-bold border"
+        <div class="relative z-10">
+          <p class="text-[10px] uppercase tracking-widest font-extrabold text-slate-400 mb-1">Código de envio</p>
+          <h3 class="text-2xl font-mono font-black tracking-tight text-white flex items-center gap-2">
+            #{{ e.codigoEnvio }}
+          </h3>
+          <span class="inline-flex items-center gap-1.5 text-xs text-slate-300 mt-1.5 font-medium bg-white/10 px-2.5 py-0.5 rounded-md backdrop-blur-sm">
+            <i class="fa-solid fa-铺 text-[10px]"></i> {{ e.sedeNombre || 'Agencia Cajamarca' }}
+          </span>
+        </div>
+        <span class="px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider border shadow-inner relative z-10"
           [class]="badgeClase(e.estadoEnvio)">
           {{ badgeTexto(e.estadoEnvio) }}
         </span>
       </div>
 
-      <div class="p-6">
+      <div class="p-6 space-y-6">
 
-        <!-- Info principal -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div class="flex flex-col gap-4">
-            <div>
-              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-0.5">Remitente</p>
-              <p class="text-sm font-bold text-black">{{ e.nombreRemitente }}</p>
-              <p class="text-xs text-slate-400">DNI {{ e.dniRemitente }}</p>
-            </div>
-            <div>
-              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-0.5">Destinatario</p>
-              <p class="text-sm font-bold text-black">{{ e.nombreDestinatario }}</p>
-              <p class="text-xs text-slate-400">DNI {{ e.dniDestinatario }}</p>
-            </div>
-          </div>
-
-          <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex flex-col gap-3">
-            <div class="flex items-start gap-3">
-              <i class="fa-solid fa-location-dot text-slate-400 mt-0.5 text-sm"></i>
-              <div>
-                <p class="text-[10px] font-bold text-slate-400 uppercase">Destino</p>
-                <p class="text-sm font-bold text-black">{{ e.provincia }}</p>
-              </div>
-            </div>
-            <div class="flex items-start gap-3">
-              <i class="fa-solid fa-calendar-day text-slate-400 mt-0.5 text-sm"></i>
-              <div>
-                <p class="text-[10px] font-bold text-slate-400 uppercase">Fecha de envío</p>
-                <p class="text-sm font-bold text-black">{{ e.fechaEnvio | date:'dd/MM/yyyy' }}</p>
-              </div>
-            </div>
-            <div class="flex items-start gap-3">
-              <i class="fa-solid fa-clock text-slate-400 mt-0.5 text-sm"></i>
-              <div>
-                <p class="text-[10px] font-bold text-slate-400 uppercase">Horario estimado</p>
-                <p class="text-sm font-bold text-black">{{ e.horaSalida }} → {{ e.horaLlegada }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Persona autorizada -->
-        @if (e.nombrePersonaAutorizada) {
-          <div class="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3">
-            <i class="fa-solid fa-id-card text-amber-500 mt-0.5"></i>
-            <div>
-              <p class="text-xs font-bold text-amber-700 uppercase tracking-wide mb-0.5">Persona autorizada para recoger</p>
-              <p class="text-sm font-bold text-black">{{ e.nombrePersonaAutorizada }}</p>
-              <p class="text-xs text-slate-500">DNI {{ e.dniPersonaAutorizada }}</p>
-            </div>
-          </div>
-        }
-
-        <!-- Producto y pago -->
-        <div class="grid grid-cols-2 gap-4 mb-6">
-          <div class="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-            <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Producto</p>
-            <p class="text-sm font-bold text-black">{{ e.producto?.tipoProductoNombre ?? '—' }}</p>
-            <p class="text-xs text-slate-500">{{ e.producto?.numeroPaquetes }} paquete(s)</p>
-          </div>
-          <div class="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-            <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Pago</p>
-            <p class="text-sm font-bold text-black">S/. {{ e.pago?.monto | number:'1.2-2' }}</p>
-            <p class="text-xs text-slate-500">{{ e.pago?.metodoPago }} · {{ e.pago?.estadoPago }}</p>
-          </div>
-        </div>
-
-        <!-- Timeline de estado -->
-        <div class="border-t border-slate-100 pt-6">
-          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-4">Seguimiento</p>
-          <div class="flex justify-between relative">
-            <div class="absolute top-4 left-4 right-4 h-0.5 bg-slate-100"></div>
+        <!-- Timeline de Estado Integrado arriba para impacto visual rápido -->
+        <div class="bg-slate-50/50 p-5 rounded-2xl border border-slate-100">
+          <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-4">Estado del envío</p>
+          
+          <div class="flex justify-between relative px-2">
+            <!-- Línea de progreso de fondo -->
+            <div class="absolute top-4 left-6 right-6 h-1 bg-slate-200 rounded-full"></div>
 
             <!-- Paso 1: Por salir -->
             <div class="relative z-10 flex flex-col items-center gap-2 flex-1">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs shrink-0 transition-all"
+              <div class="w-9 h-9 rounded-xl flex items-center justify-center text-xs shrink-0 shadow-sm transition-all duration-300 ring-4 ring-white"
                 [class]="pasoActivo(EstadoEnvio.PORSALIR) ? 'bg-black text-white' : 'bg-slate-100 text-slate-400'">
-                <i class="fa-solid fa-warehouse text-[10px]"></i>
+                <i class="fa-solid fa-warehouse"></i>
               </div>
-              <span class="text-[9px] font-bold uppercase text-slate-400 text-center">Por salir</span>
+              <span class="text-[9px] font-extrabold uppercase text-center tracking-tight"
+                [class]="pasoActivo(EstadoEnvio.PORSALIR) ? 'text-black' : 'text-slate-400'">Por salir</span>
             </div>
 
             <!-- Paso 2: Salió -->
             <div class="relative z-10 flex flex-col items-center gap-2 flex-1">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs shrink-0 transition-all"
+              <div class="w-9 h-9 rounded-xl flex items-center justify-center text-xs shrink-0 shadow-sm transition-all duration-300 ring-4 ring-white"
                 [class]="pasoActivo(EstadoEnvio.SALIO) ? 'bg-black text-white' : 'bg-slate-100 text-slate-400'">
-                <i class="fa-solid fa-box-open text-[10px]"></i>
+                <i class="fa-solid fa-box"></i>
               </div>
-              <span class="text-[9px] font-bold uppercase text-slate-400 text-center">Salió</span>
+              <span class="text-[9px] font-extrabold uppercase text-center tracking-tight"
+                [class]="pasoActivo(EstadoEnvio.SALIO) ? 'text-black' : 'text-slate-400'">Salió</span>
             </div>
 
             <!-- Paso 3: En tránsito -->
             <div class="relative z-10 flex flex-col items-center gap-2 flex-1">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs shrink-0 transition-all"
+              <div class="w-9 h-9 rounded-xl flex items-center justify-center text-xs shrink-0 shadow-sm transition-all duration-300 ring-4 ring-white"
                 [class]="pasoActivo(EstadoEnvio.ENTRANSITO) ? 'bg-black text-white' : 'bg-slate-100 text-slate-400'">
-                <i class="fa-solid fa-truck-fast text-[10px]"></i>
+                <i class="fa-solid fa-truck-fast"></i>
               </div>
-              <span class="text-[9px] font-bold uppercase text-slate-400 text-center">En tránsito</span>
+              <span class="text-[9px] font-extrabold uppercase text-center tracking-tight"
+                [class]="pasoActivo(EstadoEnvio.ENTRANSITO) ? 'text-black' : 'text-slate-400'">En tránsito</span>
             </div>
 
             <!-- Paso 4: Entregado -->
             <div class="relative z-10 flex flex-col items-center gap-2 flex-1">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs shrink-0 transition-all"
-                [class]="pasoActivo(EstadoEnvio.ENTREGADO) ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'">
-                <i class="fa-solid fa-check text-[10px]"></i>
+              <div class="w-9 h-9 rounded-xl flex items-center justify-center text-xs shrink-0 shadow-sm transition-all duration-300 ring-4 ring-white"
+                [class]="pasoActivo(EstadoEnvio.ENTREGADO) ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-slate-100 text-slate-400'">
+                <i class="fa-solid fa-check-double"></i>
               </div>
-              <span class="text-[9px] font-bold uppercase text-slate-400 text-center">Entregado</span>
+              <span class="text-[9px] font-extrabold uppercase text-center tracking-tight"
+                [class]="pasoActivo(EstadoEnvio.ENTREGADO) ? 'text-emerald-600' : 'text-slate-400'">Entregado</span>
             </div>
+          </div>
+        </div>
 
+        <!-- Bloque de Remitente y Destinatario (Ruta visual clara) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
+          <!-- Card Remitente -->
+          <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50/30 hover:bg-slate-50 transition-colors">
+            <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Remitente
+            </p>
+            <p class="text-sm font-bold text-slate-900">{{ e.nombreRemitente }}</p>
+            <p class="text-xs text-slate-500 font-medium mt-0.5 font-mono">DNI {{ e.dniRemitente }}</p>
+          </div>
+
+          <!-- Card Destinatario -->
+          <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50/30 hover:bg-slate-50 transition-colors">
+            <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-black"></span> Destinatario
+            </p>
+            <p class="text-sm font-bold text-slate-900">{{ e.nombreDestinatario }}</p>
+            <p class="text-xs text-slate-500 font-medium mt-0.5 font-mono">DNI {{ e.dniDestinatario }}</p>
+          </div>
+        </div>
+
+        <!-- Logística y Tiempos -->
+        <div class="bg-slate-900 text-slate-100 rounded-2xl p-4 grid grid-cols-3 gap-2 text-center divide-x divide-slate-800">
+          <div class="px-1">
+            <p class="text-[9px] font-bold uppercase text-slate-400 tracking-wider mb-1">Destino</p>
+            <p class="text-xs font-black truncate text-white"><i class="fa-solid fa-location-dot text-red-400 mr-1"></i>{{ e.provincia }}</p>
+          </div>
+          <div class="px-1">
+            <p class="text-[9px] font-bold uppercase text-slate-400 tracking-wider mb-1">Fecha Envío</p>
+            <p class="text-xs font-black text-white">{{ e.fechaEnvio | date:'dd/MM/yyyy' }}</p>
+          </div>
+          <div class="px-1">
+            <p class="text-[9px] font-bold uppercase text-slate-400 tracking-wider mb-1">Est. Entrega</p>
+            <p class="text-xs font-black tracking-tighter text-white">{{ e.horaSalida }} - {{ e.horaLlegada }}</p>
+          </div>
+        </div>
+
+        <!-- Persona autorizada (Alerta elegante) -->
+        @if (e.nombrePersonaAutorizada) {
+          <div class="p-4 bg-amber-50/60 border border-amber-200/80 rounded-2xl flex items-start gap-3.5 shadow-sm shadow-amber-50">
+            <div class="p-2 bg-amber-100 text-amber-800 rounded-xl text-sm shrink-0">
+              <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <div>
+              <p class="text-[10px] font-extrabold text-amber-800 uppercase tracking-wider mb-0.5">Retiro Autorizado</p>
+              <p class="text-sm font-bold text-slate-900">{{ e.nombrePersonaAutorizada }}</p>
+              <p class="text-xs text-amber-700/80 font-medium font-mono mt-0.5">DNI {{ e.dniPersonaAutorizada }}</p>
+            </div>
+          </div>
+        }
+
+        <!-- Detalles físicos del Producto y Estado de Pago -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Productos -->
+          <div class="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl flex flex-col justify-between">
+            <div>
+              <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">Contenido</p>
+              @for (prod of e.productos; track $index) {
+                <p class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                  <i class="fa-solid fa-cubes text-slate-400 text-xs"></i>
+                  {{ prod.tipoProductoNombre ?? 'Paquete estándar' }}
+                </p>
+                <div class="text-[11px] text-slate-500 font-medium space-y-0.5 mt-1 pl-5">
+                  <p>• Cantidad: {{ prod.numeroPaquetes }} ud(s).</p>
+                  <p>• Peso: {{ prod.peso ?? 0 }} kg · Masa: {{ prod.volumen ?? 0 }} m³</p>
+                </div>
+              }
+            </div>
+          </div>
+          
+          <!-- Pago -->
+          <div class="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl flex flex-col justify-between">
+            <div>
+              <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">Transacción</p>
+              <p class="text-2xl font-black text-slate-900 tracking-tight">S/. {{ e.pago?.monto | number:'1.2-2' }}</p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] font-bold">
+              <span class="text-slate-500 uppercase">{{ e.pago?.metodoPago }}</span>
+              <span class="px-2 py-0.5 rounded bg-slate-200/60 text-slate-800 uppercase text-[10px]">{{ e.pago?.estadoPago }}</span>
+            </div>
           </div>
         </div>
 
@@ -206,11 +253,13 @@
     </div>
   }
 
-  <!-- Error -->
+  <!-- ==========================================
+       MENSAJE DE ERROR
+       ========================================== -->
   @if (error()) {
-    <div class="w-full max-w-md mt-4 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 text-sm font-medium">
-      <i class="fa-solid fa-circle-exclamation"></i>
-      {{ error() }}
+    <div class="w-full max-w-xl mt-4 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-700 text-sm font-semibold shadow-sm shadow-red-50 animate-shake">
+      <i class="fa-solid fa-circle-exclamation text-base text-red-500"></i>
+      <span>{{ error() }}</span>
     </div>
   }
 

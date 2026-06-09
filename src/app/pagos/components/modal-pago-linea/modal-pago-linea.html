@@ -1,0 +1,103 @@
+<div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+     (click)="cerrar.emit()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md"
+       (click)="$event.stopPropagation()">
+
+    @if (exitoso()) {
+      <div class="p-10 text-center">
+        <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+          <i class="fa fa-check text-2xl text-green-600"></i>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900 mb-1">¡Pago exitoso!</h3>
+        <p class="text-sm text-slate-400">El envío <span class="font-mono font-bold text-slate-700">#{{ codigo() }}</span> ha sido pagado correctamente.</p>
+      </div>
+    } @else {
+
+      <!-- Header -->
+      <div class="flex items-center justify-between p-6 border-b border-slate-100">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Pago en línea</h3>
+          <p class="text-xs text-slate-400 mt-0.5">Envío <span class="font-mono">#{{ codigo() }}</span></p>
+        </div>
+        <button (click)="cerrar.emit()"
+          class="cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-black hover:bg-slate-50 transition-all">
+          <i class="fa fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Monto -->
+      <div class="mx-6 mt-5 p-4 bg-slate-900 rounded-xl text-white flex justify-between items-center">
+        <span class="text-xs text-slate-400 uppercase tracking-wide">Total a pagar</span>
+        <span class="text-xl font-bold">S/. {{ monto() | number:'1.2-2' }}</span>
+      </div>
+
+      <!-- Formulario -->
+      <div class="p-6 flex flex-col gap-4">
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Número de tarjeta</label>
+          <input (input)="formatearTarjeta($event)"
+            type="text" placeholder="0000 0000 0000 0000" maxlength="19"
+            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-mono outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Nombre del titular</label>
+          <input [(ngModel)]="form.nombreTitular"
+            type="text" placeholder="Como aparece en la tarjeta"
+            class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+        </div>
+
+        <div class="flex gap-3">
+          <div class="flex flex-col gap-1.5 flex-1">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Mes</label>
+            <select [(ngModel)]="form.mesExpiracion"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all bg-white">
+              <option value="">MM</option>
+              @for (m of meses; track m) {
+                <option [value]="m">{{ m }}</option>
+              }
+            </select>
+          </div>
+          <div class="flex flex-col gap-1.5 flex-1">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Año</label>
+            <select [(ngModel)]="form.anioExpiracion"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black transition-all bg-white">
+              <option value="">AAAA</option>
+              @for (a of anios; track a) {
+                <option [value]="a">{{ a }}</option>
+              }
+            </select>
+          </div>
+          <div class="flex flex-col gap-1.5 flex-1">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">CVV</label>
+            <input [(ngModel)]="form.cvv"
+              type="password" placeholder="•••" maxlength="4"
+              class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+          </div>
+        </div>
+
+        @if (error()) {
+          <div class="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 flex items-center gap-2">
+            <i class="fa-solid fa-circle-exclamation"></i> {{ error() }}
+          </div>
+        }
+
+        <button (click)="pagar()" [disabled]="procesando()"
+          class="cursor-pointer w-full py-3 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-slate-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-1">
+          @if (procesando()) {
+            <i class="fa fa-spinner fa-spin"></i> Procesando...
+          } @else {
+            <i class="fa fa-lock text-xs"></i> Pagar S/. {{ monto() | number:'1.2-2' }}
+          }
+        </button>
+
+        <p class="text-center text-[10px] text-slate-400 flex items-center justify-center gap-1">
+          <i class="fa fa-shield-halved"></i> Pago simulado — ningún dato es real ni se procesa
+        </p>
+
+      </div>
+    }
+
+  </div>
+</div>

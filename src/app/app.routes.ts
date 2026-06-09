@@ -24,6 +24,21 @@ export const routes: Routes = [
                     import('./home/home').then(m=>m.Home)
             },
 
+            //rutas de usuarios
+            {
+                path: 'perfil',
+                canActivate: [authGuard([Roles.CLIENTE])],
+                loadComponent: () => 
+                    import('./usuarios/components/perfil/perfil').then(m=>m.Perfil)
+            },
+
+            {
+                path: 'mis-envios',
+                canActivate: [authGuard([Roles.CLIENTE])],
+                loadComponent: () => 
+                    import('./usuarios/components/mis-envios/mis-envios').then(m=>m.MisEnvios)
+            },
+
             //rutas de dashboard
             {
                 path: 'dashboard',
@@ -80,6 +95,14 @@ export const routes: Routes = [
                 canActivate: [authGuard([Roles.ADMIN, Roles.SUPER_ADMIN])],
                 loadComponent: () => 
                     import('./usuarios/usuarios').then(m=>m.Usuarios)
+            },
+
+            //rutas de auditoria
+            {
+                path: 'auditoria',
+                canActivate: [authGuard([Roles.SUPER_ADMIN])],
+                loadComponent: () => 
+                    import('./auditoria/auditoria').then(m=>m.Auditoria)
             },
 
             //rutas de sedes

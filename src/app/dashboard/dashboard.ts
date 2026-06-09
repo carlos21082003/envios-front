@@ -29,6 +29,7 @@ export class Dashboard implements OnInit {
   private readonly COLOR_SLATE = '#94a3b8';
   private readonly COLOR_GRID  = 'rgba(0,0,0,0.05)';
   private readonly COLOR_TICK  = '#9ca3af';
+  private readonly COLOR_GREEN = '#22c55e';
  
   constructor() {
     afterNextRender(() => {
@@ -128,20 +129,21 @@ export class Dashboard implements OnInit {
   crearGraficaPagos(): void {
     const data = this.reporte();
     if (!data || !this.graficaPagosRef) return;
- 
+
     this.chartPagos?.destroy();
- 
+
     this.chartPagos = new Chart(this.graficaPagosRef.nativeElement, {
       type: 'doughnut',
       data: {
-        labels: ['Pagado', 'Pendiente', 'Pago al recoger'],
+        labels: ['Pagado', 'Pendiente', 'Pago al recoger', 'Pagado en línea'],
         datasets: [{
           data: [
-            data.pagosPagados               ?? 0,
-            data.pagosPendientesGrafica     ?? 0,
+            data.pagosPagados                ?? 0,
+            data.pagosPendientesGrafica      ?? 0,
             data.pagosPagadoAlRecogerGrafica ?? 0,
+            data.pagosPagadoEnLinea          ?? 0,  
           ],
-          backgroundColor: [this.COLOR_DARK, this.COLOR_GOLD, this.COLOR_SLATE],
+          backgroundColor: [this.COLOR_DARK, this.COLOR_GOLD, this.COLOR_SLATE, this.COLOR_GREEN],
           borderWidth: 0,
           hoverOffset: 4,
         }],

@@ -43,4 +43,13 @@ export class PagosService {
     );
   }  
 
+  pagarEnLinea(envioId: number, datos: any): Observable<any> {
+    return this.http.post<any>(`${this.urlPagos}/envio/${envioId}/pagar-en-linea`, datos).pipe(
+      catchError((error) => {
+        console.error('Error al procesar pago:', error);
+        throw error;
+      })
+    );
+  }
+
 }

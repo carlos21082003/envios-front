@@ -64,15 +64,21 @@
           <i class="fa-solid fa-magnifying-glass w-5 text-center opacity-70 group-hover:opacity-100"></i>
           <span>Rastreo en vivo</span>
         </a>
-      }
-
-      @if (hasRole('CLIENTE')) {
+        
         <a routerLink="/nueva-solicitud"
           routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
           class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
           <i class="fa-solid fa-circle-plus w-5 text-center opacity-70 group-hover:opacity-100"></i>
           <span>Solicitar</span>
         </a>
+
+        <a routerLink="/mis-envios"
+          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+          class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+          <i class="fa-solid fa-layer-group w-5 text-center opacity-70 group-hover:opacity-100"></i>
+          <span>Mis envíos</span>
+        </a>
+      
       }
 
       <!-- OPERACIONES -->
@@ -130,6 +136,13 @@
           <span>Gestión de Sedes</span>
         </a>
 
+        <a routerLink="/rutas"
+          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+          class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+          <i class="fa-solid fa-route w-5 text-center opacity-70 group-hover:opacity-100"></i>
+          <span>Rutas de Entrega</span>
+        </a>
+
         <a routerLink="/usuarios"
            routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
            class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
@@ -137,14 +150,16 @@
           <span>Gestión de Usuarios</span>
         </a>
 
-        <a routerLink="/rutas"
-          routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
-          class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
-          <i class="fa-solid fa-route w-5 text-center opacity-70 group-hover:opacity-100"></i>
-          <span>Rutas de Entrega</span>
-        </a>
       }
 
+      @if (hasRole('SUPER_ADMIN')) {
+        <a routerLink="/auditoria"
+           routerLinkActive="!bg-black !text-white shadow-xl shadow-slate-200 translate-x-2"
+           class="group flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 text-[13px] font-semibold transition-all duration-300 hover:bg-slate-50 hover:text-black">
+          <i class="fa-solid fa-shield-halved w-5 text-center opacity-70 group-hover:opacity-100"></i>
+          <span>Auditoría</span>
+        </a>
+      }
     </nav>
 
     <!-- FOOTER USUARIO -->
@@ -164,6 +179,16 @@
           </div>
         </div>
       </div>
+
+      @if (hasRole('CLIENTE')) {
+      <!-- PERFIL -->
+      <a routerLink="/perfil"
+        routerLinkActive="bg-slate-100"
+        class="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-500 text-[13px] font-semibold hover:bg-slate-50 hover:text-black transition-all duration-200">
+        <i class="fa-solid fa-circle-user w-5 text-center"></i>
+        <span>Mi perfil</span>
+      </a>
+    }
 
       <!-- CERRAR SESIÓN -->
       <button

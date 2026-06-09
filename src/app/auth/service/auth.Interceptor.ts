@@ -5,9 +5,8 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const auth   = inject(AuthService);
-  const router = inject(Router);
-  const token  = auth.getToken();
+  const auth  = inject(AuthService);
+  const token = auth.getToken();
 
 
   const reqConToken = token
@@ -18,7 +17,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error) => {
       if (error.status === 401) {
         auth.logout();
-        router.navigate(['/login']);
+        inject(Router).navigate(['/login']);
       }
       return throwError(() => error);
     })

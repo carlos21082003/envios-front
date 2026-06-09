@@ -23,6 +23,7 @@ export class ModalEditarPagos implements OnInit {
   error      = signal<string | null>(null);
 
   montoActual = signal<number>(0);
+  soloLectura = signal(false);
 
   form = {
     metodoPago: '',
@@ -33,12 +34,13 @@ export class ModalEditarPagos implements OnInit {
   ngOnInit(): void {
     this.pagosService.getPagoById(this.pagoId()).subscribe({
       next: (pago) => {
-        this.montoActual.set(pago.monto); 
+        this.montoActual.set(pago.monto);
         this.form = {
           metodoPago: pago.metodoPago,
           fechaPago:  pago.fechaPago?.slice(0, 16),
           estadoPago: pago.estadoPago,
         };
+        this.soloLectura.set(pago.estadoPago === EstadoPago.PAGADOENLINEA);
         this.cargando.set(false);
       },
       error: () => {

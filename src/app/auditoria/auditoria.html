@@ -1,0 +1,138 @@
+<div class="p-6 space-y-4">
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div class="bg-gray-50 rounded-xl p-4">
+      <p class="text-xs text-gray-500 mb-1">Total registros</p>
+      <p class="text-2xl font-medium">{{ totalElements() }}</p>
+    </div>
+    <div class="bg-gray-50 rounded-xl p-4">
+      <p class="text-xs text-gray-500 mb-1">Errores (4xx/5xx)</p>
+      <p class="text-2xl font-medium text-red-600">{{ cantidadErrores() }}</p>
+    </div>
+    <div class="bg-gray-50 rounded-xl p-4">
+      <p class="text-xs text-gray-500 mb-1">Duración prom.</p>
+      <p class="text-2xl font-medium">{{ duracionProm() }}<span class="text-sm font-normal text-gray-400"> ms</span></p>
+    </div>
+    <div class="bg-gray-50 rounded-xl p-4">
+      <p class="text-xs text-gray-500 mb-1">Última actividad</p>
+      <p class="text-sm font-medium pt-1">{{ registros()[0]?.fecha | date:'dd/MM/yy HH:mm' }}</p>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex border-b border-gray-200">
+    <button (click)="cambiarTab('todos')"
+      class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
+      [class]="tab() === 'todos' ? 'border-black text-black' : 'border-transparent text-gray-400 hover:text-black'">
+      Todos
+    </button>
+    <button (click)="cambiarTab('errores')"
+      class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
+      [class]="tab() === 'errores' ? 'border-black text-black' : 'border-transparent text-gray-400 hover:text-black'">
+      Errores
+    </button>
+    <button (click)="cambiarTab('usuario')"
+      class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
+      [class]="tab() === 'usuario' ? 'border-black text-black' : 'border-transparent text-gray-400 hover:text-black'">
+      Por usuario
+    </button>
+    <button (click)="cambiarTab('endpoint')"
+      class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
+      [class]="tab() === 'endpoint' ? 'border-black text-black' : 'border-transparent text-gray-400 hover:text-black'">
+      Por endpoint
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  @if (tab() === 'usuario') {
+    <input
+      [ngModel]="dniFiltro()"
+      (ngModelChange)="dniFiltro.set($event); onFiltroInput()"
+      placeholder="DNI del usuario..."
+      class="border border-gray-200 rounded-lg px-3 py-2 text-sm w-60 focus:outline-none focus:ring-1 focus:ring-black" />
+  }
+  @if (tab() === 'endpoint') {
+    <input
+      [ngModel]="endpointFiltro()"
+      (ngModelChange)="endpointFiltro.set($event); onFiltroInput()"
+      placeholder="Endpoint (ej: /envios)..."
+      class="border border-gray-200 rounded-lg px-3 py-2 text-sm w-72 focus:outline-none focus:ring-1 focus:ring-black" />
+  }
+
+  <!-- Tabla -->
+  <div class="overflow-x-auto rounded-xl border border-gray-100">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Método</th>
+          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Endpoint</th>
+          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Status</th>
+          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Usuario</th>
+          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Rol</th>
+          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">IP</th>
+          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">ms</th>
+          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (cargando()) {
+          @for (i of [1,2,3,4,5]; track i) {
+            <tr><td colspan="8" class="px-3 py-3"><div class="h-5 bg-gray-100 rounded animate-pulse"></div></td></tr>
+          }
+        } @else if (!registros().length) {
+          <tr><td colspan="8" class="text-center py-10 text-gray-400">Sin registros</td></tr>
+        } @else {
+          @for (r of registros(); track r.id) {
+            <tr (click)="toggleDetalle(r.id)" class="cursor-pointer hover:bg-gray-50 transition-colors border-t border-gray-100">
+              <td class="px-3 py-2.5">
+                <span class="text-xs font-medium px-2 py-1 rounded-full" [class]="badgeMetodo(r.metodo)">{{ r.metodo }}</span>
+              </td>
+              <td class="px-3 py-2.5 font-mono text-xs max-w-45 truncate">{{ r.endpoint }}</td>
+              <td class="px-3 py-2.5">
+                <span class="text-xs font-medium px-2 py-1 rounded-full" [class]="badgeStatus(r.statusCode)">{{ r.statusCode }}</span>
+              </td>
+              <td class="px-3 py-2.5 font-mono text-xs">{{ r.dniUsuario || '—' }}</td>
+              <td class="px-3 py-2.5 text-xs text-gray-500">{{ r.rolUsuario || '—' }}</td>
+              <td class="px-3 py-2.5 font-mono text-xs text-gray-500">{{ r.ipOrigen }}</td>
+              <td class="px-3 py-2.5 text-right tabular-nums">{{ r.duracionMs }}</td>
+              <td class="px-3 py-2.5 text-xs text-gray-500">{{ r.fecha | date:'dd/MM/yy HH:mm' }}</td>
+            </tr>
+            @if (expandedId() === r.id) {
+              <tr class="bg-gray-50">
+                <td colspan="8" class="px-4 py-3 space-y-2">
+                  @if (r.requestBody) {
+                    <div>
+                      <p class="text-xs font-medium text-gray-500 mb-1">Request body</p>
+                      <pre class="text-xs font-mono bg-white border border-gray-100 rounded p-2 whitespace-pre-wrap break-all max-h-24 overflow-y-auto">{{ r.requestBody }}</pre>
+                    </div>
+                  }
+                  @if (r.mensajeError) {
+                    <div>
+                      <p class="text-xs font-medium text-red-500 mb-1">Error</p>
+                      <pre class="text-xs font-mono bg-white border border-red-100 rounded p-2 whitespace-pre-wrap break-all max-h-24 overflow-y-auto text-red-700">{{ r.mensajeError }}</pre>
+                    </div>
+                  }
+                </td>
+              </tr>
+            }
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación -->
+  <div class="flex items-center justify-end gap-2 text-sm text-gray-400">
+    <span>Página {{ pagina() + 1 }} de {{ totalPages() }} · {{ totalElements() }} registros</span>
+    <button (click)="paginaAnterior()" [disabled]="pagina() === 0"
+      class="px-3 py-1.5 border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition-colors">
+      ‹
+    </button>
+    <button (click)="paginaSiguiente()" [disabled]="pagina() >= totalPages() - 1"
+      class="px-3 py-1.5 border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition-colors">
+      ›
+    </button>
+  </div>
+
+</div>

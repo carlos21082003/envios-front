@@ -1,0 +1,126 @@
+<div class="p-4 md:p-8 min-h-screen bg-slate-50 text-slate-800 antialiased selection:bg-slate-900 selection:text-white">
+  <div class="max-w-4xl mx-auto">
+
+    <!-- HEADER SENCILLO Y ELEGANTE -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Mi Cuenta</h2>
+      <p class="text-slate-500 text-xs mt-1">Administra tus datos personales y credenciales de acceso.</p>
+    </div>
+
+    @if (cargando()) {
+      <!-- ==========================================
+           SKELETON DE CARGA (PROCESANDO PETICIÓN)
+           ========================================== -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start animate-pulse">
+        
+        <!-- Columna Izquierda Skeleton -->
+        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm text-center flex flex-col items-center">
+          <div class="w-20 h-20 rounded-full bg-slate-200 mb-4"></div>
+          <div class="h-4 bg-slate-200 rounded w-3/4 mb-2"></div>
+          <div class="h-3 bg-slate-200 rounded w-1/2 mb-4"></div>
+          <div class="w-full border-t border-slate-100 my-4"></div>
+          <div class="h-6 bg-slate-200 rounded-full w-24"></div>
+        </div>
+
+        <!-- Columna Derecha Skeleton -->
+        <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
+            <div class="h-3 bg-slate-200 rounded w-32"></div>
+          </div>
+          <div class="p-6 space-y-7">
+            <div class="flex justify-between items-center">
+              <div class="h-3 bg-slate-200 rounded w-28"></div>
+              <div class="h-4 bg-slate-200 rounded w-1/2"></div>
+            </div>
+            <div class="flex justify-between items-center">
+              <div class="h-3 bg-slate-200 rounded w-28"></div>
+              <div class="h-4 bg-slate-200 rounded w-1/3"></div>
+            </div>
+            <div class="flex justify-between items-center">
+              <div class="h-3 bg-slate-200 rounded w-28"></div>
+              <div class="h-4 bg-slate-200 rounded w-1/4"></div>
+            </div>
+            <div class="flex justify-between items-center">
+              <div class="h-3 bg-slate-200 rounded w-28"></div>
+              <div class="h-4 bg-slate-200 rounded w-2/3"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    } @else {
+      <!-- ==========================================
+           CONTENEDOR PRINCIPAL CON DATOS REALES
+           ========================================== -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        
+        <!-- COLUMNA IZQUIERDA: TARJETA DE IDENTIDAD -->
+        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm text-center flex flex-col items-center">
+          <!-- Avatar circular grande y limpio sin fondos raros -->
+          <div class="w-20 h-20 rounded-full bg-slate-900 flex items-center justify-center text-white text-2xl font-bold tracking-wider mb-4 shadow-inner">
+            {{ iniciales }}
+          </div>
+          
+          <h3 class="text-base font-bold text-slate-900 leading-tight uppercase tracking-tight">{{ usuario()?.nombre }}</h3>
+          <p class="text-xs text-slate-400 font-medium mt-1">DNI {{ usuario()?.dni }}</p>
+
+          <div class="w-full border-t border-slate-100 my-4"></div>
+
+          <!-- Badge de rol estilizado -->
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 text-slate-700 text-xs font-semibold rounded-full border border-slate-200 uppercase tracking-wider">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            {{ usuario()?.rol }}
+          </span>
+        </div>
+
+        <!-- COLUMNA DERECHA: PANEL DE INFORMACIÓN DETALLADA -->
+        <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          
+          <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Información del Perfil</h4>
+          </div>
+
+          <div class="p-6 divide-y divide-slate-100">
+            
+            <!-- Fila: Nombre -->
+            <div class="py-3.5 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider w-40">Nombre completo</span>
+              <span class="text-sm font-medium text-slate-900 sm:text-right flex-1">{{ usuario()?.nombre }}</span>
+            </div>
+
+            <!-- Fila: DNI -->
+            <div class="py-3.5 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider w-40">Documento (DNI)</span>
+              <span class="text-sm font-mono text-slate-900 sm:text-right flex-1">{{ usuario()?.dni }}</span>
+            </div>
+
+            <!-- Fila: Teléfono -->
+            <div class="py-3.5 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider w-40">Teléfono</span>
+              <span class="text-sm font-mono text-slate-900 sm:text-right flex-1">{{ usuario()?.telefono ?? '—' }}</span>
+            </div>
+
+            <!-- Fila: Dirección -->
+            <div class="py-3.5 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider w-40">Dirección</span>
+              <span class="text-sm font-mono text-slate-900 sm:text-right flex-1">{{ usuario()?.direccion ?? '—' }}</span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- BOTÓN DE ACCIÓN (INTEGRADO AL ANCHO DEL CONTENIDO) -->
+      @if (hasRole('ADMIN', 'CLIENTE')) {
+        <div class="mt-6 flex justify-end">
+          <button (click)="irAMisEnvios()"
+            class="cursor-pointer w-full sm:w-auto bg-slate-900 text-white px-6 py-3 rounded-lg text-xs font-bold hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 shadow-sm uppercase tracking-wider">
+            <i class="fa fa-box-archive opacity-80"></i> Ver mis envíos
+          </button>
+        </div>
+      }
+    }
+
+  </div>
+</div>

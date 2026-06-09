@@ -41,4 +41,10 @@ export class UsuariosService {
       catchError((e) => { console.error(e); throw e; })
     );
   }
+
+  getMe(): Observable<UsuarioDTO> {
+  return this.http.get<UsuarioDTO>(`${this.urlUsuarios}/me`).pipe(
+    catchError((e) => { console.error(e); throw e; })
+  );
+}
 }

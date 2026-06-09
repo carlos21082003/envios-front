@@ -47,6 +47,12 @@ export class EnviosService {
       catchError((error) => { console.error('Error al actualizar envío:', error); throw error; })
     );
   }
+
+  getMisEnvios(): Observable<Envios[]> {
+    return this.http.get<Envios[]>(`${this.urlEnvios}/mis-envios`).pipe(
+      catchError((error) => { console.error('Error al obtener mis envíos:', error); throw error; })
+    );
+  }
 }
 
 // Interfaz auxiliar para respuestas paginadas

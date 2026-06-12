@@ -74,7 +74,7 @@ export class ModalPagoLinea {
       anioExpiracion: this.form.anioExpiracion,
     };
 
-    this.pagosService.pagarEnLinea(this.envioId(), datos).subscribe({
+    this.pagosService.pagarEnLinea(this.envioId()).subscribe({
       next: () => {
         this.exitoso.set(true);
         this.procesando.set(false);

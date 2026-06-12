@@ -454,6 +454,19 @@
             <input [(ngModel)]="completarForm.numeroPaquetes" type="number" min="1"
               class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
           </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Peso (kg)</label>
+              <input [(ngModel)]="completarForm.peso" type="number" min="0" step="0.1" placeholder="0.0"
+                class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Volumen (m³)</label>
+              <input [(ngModel)]="completarForm.volumen" type="number" min="0" step="0.01" placeholder="0.00"
+                class="px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:border-black focus:ring-2 focus:ring-slate-100 transition-all"/>
+            </div>
+          </div>
         </div>
 
         <!-- PAGO -->

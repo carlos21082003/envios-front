@@ -29,6 +29,8 @@ export interface CompletarSolicitudDTO {
   horaLlegada: string;
   tipoProductoId: number;
   numeroPaquetes: number;
+  peso: number;     
+  volumen: number;  
   metodoPago: string;
   estadoPago: string;
 }

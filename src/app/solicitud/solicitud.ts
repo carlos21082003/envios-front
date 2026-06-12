@@ -79,6 +79,8 @@ export class Solicitud {
       horaLlegada:    '',
       tipoProductoId: 0,
       numeroPaquetes: 1,
+      peso:           0,   
+      volumen:        0,   
       metodoPago:     '',
       estadoPago:     'PAGADO',
     };

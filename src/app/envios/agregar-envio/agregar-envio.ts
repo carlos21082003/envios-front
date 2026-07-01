@@ -11,6 +11,7 @@ import { SedeDTO } from '../../sede/models/sede';
 import { SedeService } from '../../sede/service/sede-service';
 import { TarifaService } from '../../tarifas/service/tarifa-service';
 import { TarifaAdicional } from '../../tarifas/models/tarifa';
+import { MetodoPago } from '../../pagos/models/metodo-pago';
 
 @Component({
   selector: 'app-agregar-envio',
@@ -56,12 +57,12 @@ export class AgregarEnvio {
     productos: [
       { tipoProductoId: 0, descripcion: '', numeroPaquetes: 1, peso: 0, volumen: 0 }
     ],
-    pago: {
-      monto:      0,
-      metodoPago: '',
-      fechaPago:  '',
-      estadoPago: EstadoPago.PAGADO,
-    },
+   pago: {
+    monto:      0,
+    metodoPago: '' as MetodoPago,  
+    fechaPago:  '',
+    estadoPago: EstadoPago.PAGADO,
+  },
     sedeOrigenId:  null as number | null,
     sedeDestinoId: null as number | null,
   };

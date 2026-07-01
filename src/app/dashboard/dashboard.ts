@@ -10,7 +10,7 @@ import { Chart } from 'chart.js/auto';
   styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
-  private reportesService = inject(DashboardService);
+ private reportesService = inject(DashboardService);
  
   @ViewChild('graficaProvincias') graficaProvinciasRef!: ElementRef;
   @ViewChild('graficaPagos')      graficaPagosRef!: ElementRef;
@@ -129,9 +129,9 @@ export class Dashboard implements OnInit {
   crearGraficaPagos(): void {
     const data = this.reporte();
     if (!data || !this.graficaPagosRef) return;
-
+ 
     this.chartPagos?.destroy();
-
+ 
     this.chartPagos = new Chart(this.graficaPagosRef.nativeElement, {
       type: 'doughnut',
       data: {
@@ -167,15 +167,18 @@ export class Dashboard implements OnInit {
     let labels:   string[];
     let efectivo: number[];
     let transf:   number[];
+    let enLinea:  number[];
  
     if (data.tendenciaIngresos?.length) {
       labels   = data.tendenciaIngresos.map((d: any) => d.fecha);
       efectivo = data.tendenciaIngresos.map((d: any) => d.efectivo);
       transf   = data.tendenciaIngresos.map((d: any) => d.transferencia);
+      enLinea  = data.tendenciaIngresos.map((d: any) => d.tarjetaEnLinea ?? 0);
     } else {
       labels   = this.generarFechas(DIAS);
       efectivo = this.distribuirEnDias(data.totalEfectivo      ?? 0, DIAS, 1.3);
       transf   = this.distribuirEnDias(data.totalTransferencia ?? 0, DIAS, 2.1);
+      enLinea  = this.distribuirEnDias(data.totalTarjetaEnLinea ?? 0, DIAS, 1.7);
     }
  
     this.chartTendencia = new Chart(this.graficaTendenciaRef.nativeElement, {
@@ -198,6 +201,16 @@ export class Dashboard implements OnInit {
             data: transf,
             borderColor: this.COLOR_GOLD,
             borderDash: [5, 3],
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.4,
+            fill: false,
+          },
+          {
+            label: 'Tarjeta en línea',
+            data: enLinea,
+            borderColor: this.COLOR_GREEN,
+            borderDash: [2, 2],
             borderWidth: 2,
             pointRadius: 0,
             tension: 0.4,
